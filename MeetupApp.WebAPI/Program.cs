@@ -22,6 +22,8 @@ namespace MeetupApp.WebAPI
             builder.Services.AddDbContext<MeetupAppDbContext>(
                 optionBuilder => optionBuilder.UseSqlServer(connectionString));
 
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             // Add services to the container.
 
             builder.Services.AddControllers();
