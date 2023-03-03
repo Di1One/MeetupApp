@@ -1,3 +1,5 @@
+using MeetupApp.DataBase;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using System.Reflection;
@@ -15,6 +17,10 @@ namespace MeetupApp.WebAPI
                .WriteTo.Console()
                .WriteTo.File(GetPathToLogFile(),
                    LogEventLevel.Information));
+
+            var connectionString = builder.Configuration.GetConnectionString("Default");
+            builder.Services.AddDbContext<MeetupAppDbContext>(
+                optionBuilder => optionBuilder.UseSqlServer(connectionString));
 
             // Add services to the container.
 
