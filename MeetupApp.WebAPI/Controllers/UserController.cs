@@ -3,6 +3,7 @@ using MeetupApp.Core.DataTransferObjects;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
+using MeetupApp.WebAPI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,14 @@ namespace MeetupApp.WebAPI.Controllers
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
         private readonly IMapper _mapper;
+        private readonly IJwtUtil _jwtUtil;
 
-        public UserController(IUserService userService, IRoleService roleService, IMapper mapper)
+        public UserController(IUserService userService, IRoleService roleService, IMapper mapper, IJwtUtil jwtUtil)
         {
             _userService = userService;
             _roleService = roleService;
             _mapper = mapper;
+            _jwtUtil = jwtUtil;
         }
 
         [HttpGet]
@@ -62,9 +65,9 @@ namespace MeetupApp.WebAPI.Controllers
                     {
                         var userInDbDto = await _userService.GetUserByEmailAsync(userDto.Email);
 
-                        //var response = await _jwtUtil.GenerateTokenAsync(userInDbDto);
+                        var response = await _jwtUtil.GenerateTokenAsync(userInDbDto);
 
-                        return Ok();
+                        return Ok(response);
                     }
                 }
 
