@@ -49,14 +49,14 @@ namespace MeetupApp.WebAPI.Controllers
             {
                 var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
                 var userDto = _mapper.Map<UserDto>(request);
-                var userWithSameEmailExists = await _userService.IsUserExists(request.Email);
+                var userWithSameEmailExists = await _userService.IsUserExistsAsync(request.Email);
 
                 if (userDto != null
                     && !userWithSameEmailExists
                     && request.Password.Equals(request.PasswordConfirmation))
                 {
                     userDto.RoleId = userRoleId;
-                    var result = await _userService.RegisterUser(userDto, request.Password);
+                    var result = await _userService.RegisterUserAsync(userDto, request.Password);
 
                     if (result > 0)
                     {

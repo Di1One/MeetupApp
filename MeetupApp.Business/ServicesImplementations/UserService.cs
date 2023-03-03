@@ -67,17 +67,17 @@ namespace MeetupApp.Business.ServicesImplementations
             throw new ArgumentException("Could not find a token with the specified model . ", nameof(refreshToken));
         }
 
-        public async Task<bool> IsUserExists(Guid userId)
+        public async Task<bool> IsUserExistsAsync(Guid userId)
         {
             return await _unitOfWork.Users.Get().AnyAsync(user => user.Id.Equals(userId));
         }
 
-        public async Task<bool> IsUserExists(string email)
+        public async Task<bool> IsUserExistsAsync(string email)
         {
             return await _unitOfWork.Users.Get().AnyAsync(user => user.Email.Equals(email));
         }
 
-        public async Task<bool> CheckUserPassword(string email, string password)
+        public async Task<bool> CheckUserPasswordAsync(string email, string password)
         {
             var dbPasswordHash = (await _unitOfWork.Users
                 .Get()
@@ -87,14 +87,14 @@ namespace MeetupApp.Business.ServicesImplementations
             return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
         }
 
-        public async Task<bool> CheckUserPassword(Guid userId, string password)
+        public async Task<bool> CheckUserPasswordAsync(Guid userId, string password)
         {
             var dbPasswordHash = (await _unitOfWork.Users.GetByIdAsync(userId))?.PasswordHash;
 
             return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
         }
 
-        public async Task<int> RegisterUser(UserDto dto, string password)
+        public async Task<int> RegisterUserAsync(UserDto dto, string password)
         {
             var user = _mapper.Map<User>(dto);
 

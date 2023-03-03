@@ -40,7 +40,7 @@ namespace MeetupApp.WebAPI.Controllers
             {
                 var user = await _userService.GetUserByEmailAsync(request.Email);
 
-                var isPassCorrect = await _userService.CheckUserPassword(request.Email, request.Password);
+                var isPassCorrect = await _userService.CheckUserPasswordAsync(request.Email, request.Password);
 
                 if (!isPassCorrect)
                 {
