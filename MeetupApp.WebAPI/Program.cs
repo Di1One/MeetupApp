@@ -47,7 +47,10 @@ namespace MeetupApp.WebAPI
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.IncludeXmlComments(builder.Configuration["XmlDoc"]);
+            });
 
             var app = builder.Build();
 
