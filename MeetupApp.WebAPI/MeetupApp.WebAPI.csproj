@@ -26,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Utils\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\MeetupApp.Business\MeetupApp.Business.csproj" />
     <ProjectReference Include="..\MeetupApp.Core\MeetupApp.Core.csproj" />
     <ProjectReference Include="..\MeetupApp.Data.Repositories\MeetupApp.Data.Repositories.csproj" />
