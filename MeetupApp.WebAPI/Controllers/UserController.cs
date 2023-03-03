@@ -29,13 +29,13 @@ namespace MeetupApp.WebAPI.Controllers
             _jwtUtil = jwtUtil;
         }
 
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> Get()
-        {
-            var users = await _userService.GetAllUsers();
-            return Ok(users);
-        }
+        //[HttpGet]
+        //[Authorize]
+        //public async Task<IActionResult> Get()
+        //{
+        //    var users = await _userService.GetAllUsers();
+        //    return Ok(users);
+        //}
 
         /// <summary>
         /// Register user
@@ -47,16 +47,15 @@ namespace MeetupApp.WebAPI.Controllers
         {
             try
             {
-                var userRoleId = await _roleService.GetRoleIdByNameAsync("User");
+                var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
                 var userDto = _mapper.Map<UserDto>(request);
                 var userWithSameEmailExists = await _userService.IsUserExists(request.Email);
 
                 if (userDto != null
-                    && userRoleId != null
                     && !userWithSameEmailExists
                     && request.Password.Equals(request.PasswordConfirmation))
                 {
-                    userDto.RoleId = userRoleId.Value;
+                    userDto.RoleId = userRoleId;
                     var result = await _userService.RegisterUser(userDto, request.Password);
 
                     if (result > 0)

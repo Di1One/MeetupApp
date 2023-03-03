@@ -1,34 +1,43 @@
 ﻿using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 
 namespace MeetupApp.Business.ServicesImplementations
 {
     public class RoleService : IRoleService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration _configuration;
 
-        public RoleService(IUnitOfWork unitOfWork)
+        public RoleService(IUnitOfWork unitOfWork, IConfiguration configuration = null)
         {
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
         }
 
-        public async Task<string> GetRoleNameByIdAsync(Guid id)
+        public async Task<Guid> GetRoleIdForDefaultRoleAsync()
         {
-            var role = await _unitOfWork.Roles.GetByIdAsync(id);
-
-            return role != null
-                ? role.Name
-                : string.Empty;
-        }
-
-        public async Task<Guid?> GetRoleIdByNameAsync(string name)
-        {
+            var roleNameByDefault = GetDefaultRoleNameForUser();
             var role = await _unitOfWork.Roles
-                .FindBy(role1 => role1.Name.Equals(name))
-                .FirstOrDefaultAsync();
+                .FindBy(r =>
+                    r.Name.Equals(roleNameByDefault))
+                .AsNoTracking().FirstOrDefaultAsync();
+            if (role == null)
+                throw new ArgumentException(
+                    $"There is no entry in the database matching the default role value: {nameof(roleNameByDefault)}");
 
-            return role?.Id;
+            return role.Id;
+        }
+        private string GetDefaultRoleNameForUser()
+        {
+            var roleName = _configuration["RoleByDefault"];
+            if (roleName == null)
+                throw new JsonException(
+                    "Failed to retrieve a valid default role value.");
+
+            return roleName;
         }
     }
 }
