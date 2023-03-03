@@ -46,6 +46,7 @@ namespace MeetupApp.WebAPI
             builder.Services.AddScoped<IRepository<User>, Repository<User>>();
             builder.Services.AddScoped<IRepository<Role>, Repository<Role>>();
             builder.Services.AddScoped<IRepository<RefreshToken>, Repository<RefreshToken>>();
+            builder.Services.AddScoped<IRepository<Event>, Repository<Event>>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
