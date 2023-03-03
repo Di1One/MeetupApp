@@ -1,3 +1,8 @@
+using Serilog;
+using Serilog.Events;
+using System.Reflection;
+using System.Text;
+
 namespace MeetupApp.WebAPI
 {
     public class Program
@@ -6,10 +11,15 @@ namespace MeetupApp.WebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Host.UseSerilog((ctx, lc) => lc
+               .WriteTo.Console()
+               .WriteTo.File(GetPathToLogFile(),
+                   LogEventLevel.Information));
+
             // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -30,6 +40,17 @@ namespace MeetupApp.WebAPI
             app.MapControllers();
 
             app.Run();
+        }
+
+        // Returns the path for log file recording.
+        private static string GetPathToLogFile()
+        {
+            var sb = new StringBuilder();
+            sb.Append(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            sb.Append(@"\logs\");
+            sb.Append($"{DateTime.Now:yyyyMMddhhmmss}");
+            sb.Append("data.log");
+            return sb.ToString();
         }
     }
 }
