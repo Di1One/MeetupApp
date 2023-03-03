@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using MeetupApp.Core.ServiceAbstractions;
+﻿using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
 using MeetupApp.WebAPI.Utils;
@@ -13,15 +12,12 @@ namespace MeetupApp.WebAPI.Controllers
     public class TokenController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IMapper _mapper;
         private readonly IJwtUtil _jwtUtil;
 
         public TokenController(IUserService userService,
-            IMapper mapper,
             IJwtUtil jwtUtil)
         {
             _userService = userService;
-            _mapper = mapper;
             _jwtUtil = jwtUtil;
         }
 

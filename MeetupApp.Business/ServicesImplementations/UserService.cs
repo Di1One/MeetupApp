@@ -21,25 +21,25 @@ namespace MeetupApp.Business.ServicesImplementations
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<UserDto?> GetUserByIdAsync(Guid id)
-        {
-            var entity = await _unitOfWork.Users.GetByIdAsync(id);
+        //public async Task<UserDto?> GetUserByIdAsync(Guid id)
+        //{
+        //    var entity = await _unitOfWork.Users.GetByIdAsync(id);
 
-            if (entity == null)
-                throw new ArgumentException("Failed to find record in the database that match the specified id.", nameof(id));
+        //    if (entity == null)
+        //        throw new ArgumentException("Failed to find record in the database that match the specified id.", nameof(id));
 
-            var dto = _mapper.Map<UserDto>(entity);
-            return dto;
-        }
+        //    var dto = _mapper.Map<UserDto>(entity);
+        //    return dto;
+        //}
 
-        public async Task<IEnumerable<UserDto>> GetAllUsers()
-        {
-            return (await _unitOfWork.Users
-                .Get()
-                .ToListAsync())
-                .Select(user => _mapper.Map<UserDto>(user))
-                .ToArray();
-        }
+        //public async Task<IEnumerable<UserDto>> GetAllUsers()
+        //{
+        //    return (await _unitOfWork.Users
+        //        .Get()
+        //        .ToListAsync())
+        //        .Select(user => _mapper.Map<UserDto>(user))
+        //        .ToArray();
+        //}
 
         public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
