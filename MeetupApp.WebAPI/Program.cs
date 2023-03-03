@@ -51,14 +51,16 @@ namespace MeetupApp.WebAPI
 
             var app = builder.Build();
 
+            app.UseStaticFiles();
+            app.UseRouting();
+
+            app.UseHttpsRedirection();
 
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
+            app.UseAuthorization();
 
             app.MapControllers();
 
