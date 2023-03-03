@@ -5,7 +5,7 @@ using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace MeetupApp.Data.Repositories.Repositories
+namespace MeetupApp.Data.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class, IBaseEntity
     {

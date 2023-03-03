@@ -1,9 +1,15 @@
+using MeetupApp.Business.ServicesImplementations;
+using MeetupApp.Core.ServiceAbstractions;
+using MeetupApp.Data.Abstractions.Repositories;
+using MeetupApp.Data.Abstractions;
 using MeetupApp.DataBase;
+using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using System.Reflection;
 using System.Text;
+using MeetupApp.Data.Repositories;
 
 namespace MeetupApp.WebAPI
 {
@@ -18,13 +24,23 @@ namespace MeetupApp.WebAPI
                .WriteTo.File(GetPathToLogFile(),
                    LogEventLevel.Information));
 
+            // Add services to the container.
+
             var connectionString = builder.Configuration.GetConnectionString("Default");
             builder.Services.AddDbContext<MeetupAppDbContext>(
                 optionBuilder => optionBuilder.UseSqlServer(connectionString));
 
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            // Add services to the container.
+            // Add business services
+            builder.Services.AddScoped<IRoleService, RoleService>();
+
+            // Add repositories
+            builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+            builder.Services.AddScoped<IRepository<Role>, Repository<Role>>();
+            builder.Services.AddScoped<IRepository<RefreshToken>, Repository<RefreshToken>>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
             builder.Services.AddControllers();
 
