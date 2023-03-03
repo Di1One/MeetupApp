@@ -10,6 +10,9 @@ using Serilog;
 
 namespace MeetupApp.WebAPI.Controllers
 {
+    /// <summary>
+    /// Controller that provides API endpoints for the User resource.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
