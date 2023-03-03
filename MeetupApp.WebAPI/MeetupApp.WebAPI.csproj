@@ -30,7 +30,6 @@
     <Folder Include="Models\Requests\" />
     <Folder Include="Models\Responces\" />
     <Folder Include="Utils\" />
-    <Folder Include="MappingProfiles\" />
   </ItemGroup>
 
   <ItemGroup>
