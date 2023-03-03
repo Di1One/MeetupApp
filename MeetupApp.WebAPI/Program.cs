@@ -34,6 +34,7 @@ namespace MeetupApp.WebAPI
 
             // Add business services
             builder.Services.AddScoped<IRoleService, RoleService>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             // Add repositories
             builder.Services.AddScoped<IRepository<User>, Repository<User>>();
