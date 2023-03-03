@@ -10,6 +10,7 @@ using Serilog.Events;
 using System.Reflection;
 using System.Text;
 using MeetupApp.Data.Repositories;
+using MeetupApp.WebAPI.Utils;
 
 namespace MeetupApp.WebAPI
 {
@@ -36,6 +37,7 @@ namespace MeetupApp.WebAPI
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            builder.Services.AddScoped<IJwtUtil, JwtUtil>();
 
             // Add repositories
             builder.Services.AddScoped<IRepository<User>, Repository<User>>();
