@@ -1,10 +1,11 @@
-﻿using MeetupApp.Data.Abstractions;
+﻿using MeetupApp.Core.ServiceAbstractions;
+using MeetupApp.Data.Abstractions;
 using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeetupApp.Business.ServicesImplementations
 {
-    public class RefreshTokenService
+    public class RefreshTokenService : IRefreshTokenService
     {
         private readonly IUnitOfWork _unitOfWork;
 
