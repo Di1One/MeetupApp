@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MeetupApp.Core.DataTransferObjects;
 using MeetupApp.DataBase.Entities;
+using MeetupApp.WebAPI.Models.Requests;
 
 namespace MeetupApp.WebAPI.MappingProfiles
 {
@@ -14,6 +15,8 @@ namespace MeetupApp.WebAPI.MappingProfiles
             CreateMap<UserDto, User>()
                 .ForMember(ent => ent.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
                 .ForMember(ent => ent.RegistrationDate, opt => opt.MapFrom(dto => DateTime.Now));
+
+            CreateMap<RegisterUserRequestModel, UserDto>();
         }
     }
 }
