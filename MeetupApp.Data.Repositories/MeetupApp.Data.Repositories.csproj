@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MeetupApp.Data.Abstractions\MeetupApp.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\MeetupApp.DataBase\MeetupApp.DataBase.csproj" />
+  </ItemGroup>
+
 </Project>
