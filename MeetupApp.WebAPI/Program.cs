@@ -11,6 +11,8 @@ using System.Reflection;
 using System.Text;
 using MeetupApp.Data.Repositories;
 using MeetupApp.WebAPI.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MeetupApp.WebAPI
 {
@@ -53,6 +55,27 @@ namespace MeetupApp.WebAPI
             {
                 options.IncludeXmlComments(builder.Configuration["XmlDoc"]);
             });
+
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(opt =>
+                {
+                    // Only for develop environment.
+                    opt.RequireHttpsMetadata = false;
+                    opt.SaveToken = true;
+                    opt.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = builder.Configuration["Token:Issuer"],
+                        ValidAudience = builder.Configuration["Token:Issuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:JwtSecret"])),
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
 
             var app = builder.Build();
 
