@@ -73,6 +73,7 @@ namespace MeetupApp.WebAPI.Controllers
             {
                 if (model != null)
                 {
+                    // todo realize
                     return CreatedAtAction(nameof(CreateEvent), new { id = model });
                 }
 
