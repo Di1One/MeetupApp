@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MeetupApp.Core\MeetupApp.Core.csproj" />
+    <ProjectReference Include="..\MeetupApp.Data.Abstractions\MeetupApp.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\MeetupApp.Data.Repositories\MeetupApp.Data.Repositories.csproj" />
+  </ItemGroup>
+
+</Project>

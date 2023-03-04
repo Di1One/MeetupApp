@@ -5,6 +5,16 @@ VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetupApp.WebAPI", "MeetupApp.WebAPI\MeetupApp.WebAPI.csproj", "{3BA0D8ED-E000-4E1A-97B3-C38B0489AA4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetupApp.DataBase", "MeetupApp.DataBase\MeetupApp.DataBase.csproj", "{7D4450BA-19FB-4D9C-92E2-C437456C0E26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetupApp.Core", "MeetupApp.Core\MeetupApp.Core.csproj", "{7C849A0D-664C-4E42-B399-11CF6C9A93D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetupApp.Business", "MeetupApp.Business\MeetupApp.Business.csproj", "{D7E80389-0DC7-4526-8F7D-818DA1EDC95C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetupApp.Data.Abstractions", "MeetupApp.Data.Abstractions\MeetupApp.Data.Abstractions.csproj", "{D0797FAE-3A65-4D39-8472-6582319CC963}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetupApp.Data.Repositories", "MeetupApp.Data.Repositories\MeetupApp.Data.Repositories.csproj", "{B9CDDD35-838D-4031-B0D4-666D181CF06E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +25,26 @@ Global
 		{3BA0D8ED-E000-4E1A-97B3-C38B0489AA4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BA0D8ED-E000-4E1A-97B3-C38B0489AA4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BA0D8ED-E000-4E1A-97B3-C38B0489AA4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D4450BA-19FB-4D9C-92E2-C437456C0E26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D4450BA-19FB-4D9C-92E2-C437456C0E26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D4450BA-19FB-4D9C-92E2-C437456C0E26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D4450BA-19FB-4D9C-92E2-C437456C0E26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C849A0D-664C-4E42-B399-11CF6C9A93D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C849A0D-664C-4E42-B399-11CF6C9A93D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C849A0D-664C-4E42-B399-11CF6C9A93D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C849A0D-664C-4E42-B399-11CF6C9A93D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7E80389-0DC7-4526-8F7D-818DA1EDC95C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7E80389-0DC7-4526-8F7D-818DA1EDC95C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7E80389-0DC7-4526-8F7D-818DA1EDC95C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7E80389-0DC7-4526-8F7D-818DA1EDC95C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0797FAE-3A65-4D39-8472-6582319CC963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0797FAE-3A65-4D39-8472-6582319CC963}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0797FAE-3A65-4D39-8472-6582319CC963}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0797FAE-3A65-4D39-8472-6582319CC963}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9CDDD35-838D-4031-B0D4-666D181CF06E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9CDDD35-838D-4031-B0D4-666D181CF06E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9CDDD35-838D-4031-B0D4-666D181CF06E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9CDDD35-838D-4031-B0D4-666D181CF06E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
