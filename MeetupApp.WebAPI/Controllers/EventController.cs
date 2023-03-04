@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MeetupApp.Business.ServicesImplementations;
+using MeetupApp.Core;
 using MeetupApp.Core.DataTransferObjects;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
@@ -7,6 +8,7 @@ using MeetupApp.WebAPI.Models.Responces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using System.Reflection;
 
 namespace MeetupApp.WebAPI.Controllers
 {
@@ -57,7 +59,7 @@ namespace MeetupApp.WebAPI.Controllers
 
                 if (response == null)
                 {
-                    throw new ArgumentException("The same entry already exists in the storage.", nameof(response));
+                    throw new ArgumentException("Mapping troubles from dto to model", nameof(response));
                 }
 
                 return Ok(response);
@@ -167,7 +169,35 @@ namespace MeetupApp.WebAPI.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateEvent(Guid id, [FromBody] AddOrUpdateEventRequestModel model)
         {
-            return Ok();
+            try
+            {
+                //if (model == null)
+                //    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
+
+                //var result = await _eventService.UpdateAsync(dto);
+
+                //if(result == 0)
+                //    throw new ArgumentNullException(nameof(model), "Nothing was chanched.");
+
+                //var response = _mapper.Map<EventResponceModel>(dto);
+
+                //if (response == null)
+                //{
+                //    throw new ArgumentException("Mapping troubles from dto to model", nameof(response));
+                //}
+
+                return Ok();
+            }
+            catch (ArgumentNullException ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return BadRequest(new ErrorModel { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpPatch("{id}")]
@@ -177,7 +207,30 @@ namespace MeetupApp.WebAPI.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PatchEvent(Guid id, [FromBody] AddOrUpdateEventRequestModel model)
         {
-            return Ok();
+            try
+            {
+                if (model == null)
+                    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
+
+                var dto = _mapper.Map<EventDto>(model);
+
+                var result = await _eventService.PatchEventAsync(id, dto);
+
+                if(result == 0)
+                    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
+
+                return Ok();
+            }
+            catch (ArgumentNullException ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return BadRequest(new ErrorModel { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                return StatusCode(500);
+            }
         }
 
         /// <summary>
