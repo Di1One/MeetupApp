@@ -4,6 +4,7 @@ using MeetupApp.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MeetupApp.DataBase.Migrations
 {
     [DbContext(typeof(MeetupAppDbContext))]
-    partial class MeetupAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230304080959_AddEventsEntityToDb")]
+    partial class AddEventsEntityToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace MeetupApp.DataBase.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("EventUser", b =>
-                {
-                    b.Property<Guid>("EventsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsersId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("EventsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("EventUser");
-                });
 
             modelBuilder.Entity("MeetupApp.DataBase.Entities.Event", b =>
                 {
@@ -51,20 +39,26 @@ namespace MeetupApp.DataBase.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Owner")
+                    b.Property<string>("Speaker")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Events");
                 });
@@ -130,19 +124,15 @@ namespace MeetupApp.DataBase.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("EventUser", b =>
+            modelBuilder.Entity("MeetupApp.DataBase.Entities.Event", b =>
                 {
-                    b.HasOne("MeetupApp.DataBase.Entities.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsId")
+                    b.HasOne("MeetupApp.DataBase.Entities.User", "User")
+                        .WithMany("Events")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MeetupApp.DataBase.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MeetupApp.DataBase.Entities.RefreshToken", b =>
@@ -174,6 +164,8 @@ namespace MeetupApp.DataBase.Migrations
 
             modelBuilder.Entity("MeetupApp.DataBase.Entities.User", b =>
                 {
+                    b.Navigation("Events");
+
                     b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
