@@ -118,7 +118,7 @@ Run the project using the standard Visual Studio tools or the dotnet CLI.
 
 ### 4.1. Summary
 
-The application consists of two independent projects - the Web API project and the React project.
+The application consists of the Web API project. 
 
 ### 4.2. Web API project
 
