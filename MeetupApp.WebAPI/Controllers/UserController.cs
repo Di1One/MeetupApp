@@ -2,6 +2,7 @@
 using MeetupApp.Core.DataTransferObjects;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
+using MeetupApp.WebAPI.Models.Responces;
 using MeetupApp.WebAPI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,20 +30,15 @@ namespace MeetupApp.WebAPI.Controllers
             _jwtUtil = jwtUtil;
         }
 
-        //[HttpGet]
-        //[Authorize]
-        //public async Task<IActionResult> Get()
-        //{
-        //    var users = await _userService.GetAllUsers();
-        //    return Ok(users);
-        //}
-
         /// <summary>
         /// Register user
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] RegisterUserRequestModel request)
         {
             try

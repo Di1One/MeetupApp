@@ -65,9 +65,9 @@ namespace MeetupApp.Business.ServicesImplementations
             return await _unitOfWork.Commit();
         }
 
-        public async Task<int> DeleteEventAsync(EventDto dto)
+        public async Task<int> DeleteEventAsync(Guid id)
         {
-            var entity = _mapper.Map<Event>(dto);
+            var entity = await _unitOfWork.Events.GetByIdAsync(id);
 
             if (entity != null)
             {
@@ -76,7 +76,7 @@ namespace MeetupApp.Business.ServicesImplementations
             }
             else
             {
-                throw new ArgumentException("",nameof(dto));
+                throw new ArgumentException("Event for removing doesn't exist.", nameof(id));
             }
         }
     }

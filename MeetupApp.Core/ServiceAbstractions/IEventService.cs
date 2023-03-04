@@ -9,6 +9,6 @@ namespace MeetupApp.Core.ServiceAbstractions
         Task<int> CreateEventAsync(EventDto dto);
         Task<int> UpdateAsync(EventDto dto);
         Task<int> PatchEventAsync(Guid id, List<PatchModel> patchList);
-        Task<int> DeleteEventAsync(EventDto dto);
+        Task<int> DeleteEventAsync(Guid id);
     }
 }
