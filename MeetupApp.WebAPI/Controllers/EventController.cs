@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using MeetupApp.Business.ServicesImplementations;
 using MeetupApp.Core;
 using MeetupApp.Core.DataTransferObjects;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System.Reflection;
@@ -142,7 +140,7 @@ namespace MeetupApp.WebAPI.Controllers
                     eventDto.UserId = user.Id;
                     var result = await _eventService.CreateEventAsync(eventDto);
 
-                    return CreatedAtAction(nameof(CreateEvent), new { id = model });
+                    return CreatedAtAction(nameof(CreateEvent), model);
                 }
 
                 return BadRequest();
@@ -212,24 +210,47 @@ namespace MeetupApp.WebAPI.Controllers
         {
             try
             {
-                if (model == null)
-                    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
+                if (ModelState.IsValid)
+                {
+                    var sourceDto = await _eventService.GetEventByIdAsync(id);
 
-                var dto = _mapper.Map<EventDto>(model);
-                dto.Id = id;
-                var result = await _eventService.PatchEventAsync(id, dto);
+                    var dto = _mapper.Map<EventDto>(model);
+                    dto.UserId = sourceDto.UserId;
+                    dto.Id = id;
 
-                if(result == 0)
-                    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
+                    var patchList = new List<PatchModel>();
 
-                var responce = _mapper.Map<EventResponceModel>(dto);
+                    foreach (PropertyInfo property in typeof(EventDto).GetProperties())
+                    {
+                        if (!property.GetValue(dto).Equals(property.GetValue(sourceDto)))
+                        {
+                            patchList.Add(new PatchModel()
+                            {
+                                PropertyName = property.Name,
+                                PropertyValue = property.GetValue(dto)
+                            });
+                        }
+                    }
 
-                return Ok(responce);
-            }
-            catch (ArgumentNullException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
+                    if (patchList.Any())
+                    {
+                        await _eventService.PatchEventAsync(id, patchList);
+                    }
+                    else
+                    {
+                        return StatusCode(StatusCodes.Status304NotModified, model);
+                    }
+
+                    var updatedEvent = await _eventService.GetEventByIdAsync(id);
+
+                    var responseModel = _mapper.Map<EventResponceModel>(updatedEvent);
+
+                    return Ok(responseModel);
+                }
+                else
+                {
+                    return Ok();
+                }
             }
             catch (Exception ex)
             {

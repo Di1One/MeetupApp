@@ -13,7 +13,6 @@ namespace MeetupApp.WebAPI.MappingProfiles
             CreateMap<Event, EventDto>();
 
             CreateMap<EventDto, Event>()
-                .ForMember(ent => ent.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
                 .ForMember(ent => ent.CreatedDate, opt => opt.MapFrom(dto => DateTime.Now));
 
             CreateMap<AddOrUpdateEventRequestModel, EventDto>();

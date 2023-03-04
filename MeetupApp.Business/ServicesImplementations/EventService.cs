@@ -50,9 +50,10 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<int> UpdateAsync(Guid id, EventDto dto)
         {
-            var sourceDto = await _unitOfWork.Events.GetByIdAsync(id);
+            var sourceDto = await GetEventByIdAsync(id);
 
             dto.Id = sourceDto.Id;
+            dto.UserId = sourceDto.UserId;
 
             var entity = _mapper.Map<Event>(dto);
 
@@ -63,51 +64,8 @@ namespace MeetupApp.Business.ServicesImplementations
             return await _unitOfWork.Commit();
         }
 
-        public async Task<int> PatchEventAsync(Guid id, EventDto dto)
-        {
-            var sourceDto = await GetEventByIdAsync(id);
-
-            var patchList = new List<PatchModel>();
-
-            if (dto != null)
-            {
-                if (!dto.Name.Equals(sourceDto.Name))
-                {
-                    patchList.Add(new PatchModel()
-                    {
-                        PropertyName = nameof(dto.Name),
-                        PropertyValue = dto.Name
-                    });
-                }
-
-                if (!dto.Description.Equals(sourceDto.Description))
-                {
-                    patchList.Add(new PatchModel()
-                    {
-                        PropertyName = nameof(dto.Description),
-                        PropertyValue = dto.Description
-                    });
-                }
-
-                if (!dto.Location.Equals(sourceDto.Location))
-                {
-                    patchList.Add(new PatchModel()
-                    {
-                        PropertyName = nameof(dto.Location),
-                        PropertyValue = dto.Location
-                    });
-                }
-
-                if (!dto.StartTime.Equals(sourceDto.StartTime))
-                {
-                    patchList.Add(new PatchModel()
-                    {
-                        PropertyName = nameof(dto.StartTime),
-                        PropertyValue = dto.StartTime
-                    });
-                }
-            }
-
+        public async Task<int> PatchEventAsync(Guid id, List<PatchModel> patchList)
+        {   
             await _unitOfWork.Events.PatchAsync(id, patchList);
             return await _unitOfWork.Commit();
         }
