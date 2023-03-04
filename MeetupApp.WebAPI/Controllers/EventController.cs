@@ -6,6 +6,7 @@ using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System.Reflection;
@@ -171,20 +172,22 @@ namespace MeetupApp.WebAPI.Controllers
         {
             try
             {
-                //if (model == null)
-                //    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
+                if (model == null)
+                    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
 
-                //var result = await _eventService.UpdateAsync(dto);
+                var dto = _mapper.Map<EventDto>(model);
 
-                //if(result == 0)
-                //    throw new ArgumentNullException(nameof(model), "Nothing was chanched.");
+                var result = await _eventService.UpdateAsync(id, dto);
 
-                //var response = _mapper.Map<EventResponceModel>(dto);
+                if (result == 0)
+                    throw new ArgumentNullException(nameof(model), "Nothing was chanched.");
 
-                //if (response == null)
-                //{
-                //    throw new ArgumentException("Mapping troubles from dto to model", nameof(response));
-                //}
+                var response = _mapper.Map<EventResponceModel>(dto);
+
+                if (response == null)
+                {
+                    throw new ArgumentException("Mapping troubles from dto to model", nameof(response));
+                }
 
                 return Ok();
             }
@@ -213,13 +216,15 @@ namespace MeetupApp.WebAPI.Controllers
                     throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
 
                 var dto = _mapper.Map<EventDto>(model);
-
+                dto.Id = id;
                 var result = await _eventService.PatchEventAsync(id, dto);
 
                 if(result == 0)
                     throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
 
-                return Ok();
+                var responce = _mapper.Map<EventResponceModel>(dto);
+
+                return Ok(responce);
             }
             catch (ArgumentNullException ex)
             {

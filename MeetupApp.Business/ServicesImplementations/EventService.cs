@@ -48,8 +48,12 @@ namespace MeetupApp.Business.ServicesImplementations
             return await _unitOfWork.Commit();
         }
 
-        public async Task<int> UpdateAsync(EventDto dto)
+        public async Task<int> UpdateAsync(Guid id, EventDto dto)
         {
+            var sourceDto = await _unitOfWork.Events.GetByIdAsync(id);
+
+            dto.Id = sourceDto.Id;
+
             var entity = _mapper.Map<Event>(dto);
 
             if (entity == null)
@@ -61,7 +65,7 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<int> PatchEventAsync(Guid id, EventDto dto)
         {
-            var sourceDto = await _unitOfWork.Events.GetByIdAsync(id);
+            var sourceDto = await GetEventByIdAsync(id);
 
             var patchList = new List<PatchModel>();
 
