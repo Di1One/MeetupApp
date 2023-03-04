@@ -3,7 +3,7 @@
     /// <summary>
     /// Model for request creating or modifying an event
     /// </summary>
-    public class AddOrUpdateEventRequestModel
+    public class AddorUpdateEventRequestModel
     {
         public string Name { get; set; }
         public string Description { get; set; }

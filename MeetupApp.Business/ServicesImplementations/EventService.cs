@@ -40,6 +40,7 @@ namespace MeetupApp.Business.ServicesImplementations
         public async Task<int> CreateEventAsync(EventDto dto)
         {
             var entity = _mapper.Map<Event>(dto);
+            entity.Id = Guid.NewGuid();
 
             if (entity == null)
                 throw new ArgumentException("Mapping EventDto to Event was not possible.", nameof(dto));
