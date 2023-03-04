@@ -17,7 +17,7 @@ Table of contents
 
 ## 1. About
 
-This project implements an online store using ASP.NET Core WebAPI for the back-end.
+This project implements an API for working with events using ASP.NET Core WebAPI.
 
 ### 1.1. Main application features
 
