@@ -79,5 +79,10 @@ namespace MeetupApp.Business.ServicesImplementations
                 throw new ArgumentException("Event for removing doesn't exist.", nameof(id));
             }
         }
+
+        public async Task<bool> IsEventExistAsync(string name)
+        {
+            return await _unitOfWork.Events.Get().AnyAsync(ev => ev.Name.Equals(name));
+        }
     }
 }
