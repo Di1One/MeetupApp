@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>E:\C#\AspNetNewsAgregator\AspNetNewsAgregator.WebAPI\doc.xml</DocumentationFile>
+    <DocumentationFile>E:\C#\MeetupApp\MeetupApp.WebAPI\doc.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
