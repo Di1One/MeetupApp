@@ -12,5 +12,7 @@
 
         public List<RefreshToken> RefreshTokens { get; set; }
 
+        public List<Event>? Events { get; set; }
+
     }
 }

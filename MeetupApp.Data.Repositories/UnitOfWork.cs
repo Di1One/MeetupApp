@@ -10,17 +10,20 @@ namespace MeetupApp.Data.Repositories
         private readonly MeetupAppDbContext _dbContext;
         public IRepository<User> Users { get; }
         public IRepository<Role> Roles { get; }
+        public IRepository<Event> Events { get; }
         public IRepository<RefreshToken> RefreshToken { get; }
 
-        public UnitOfWork(MeetupAppDbContext dbContext, 
+        public UnitOfWork(MeetupAppDbContext dbContext,
             IRepository<User> users,
             IRepository<Role> roles,
-            IRepository<RefreshToken> refreshToken)
+            IRepository<RefreshToken> refreshToken,
+            IRepository<Event> events)
         {
             _dbContext = dbContext;
             Users = users;
             Roles = roles;
             RefreshToken = refreshToken;
+            Events = events;
         }
 
         public async Task<int> Commit()
