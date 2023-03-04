@@ -34,7 +34,7 @@ namespace MeetupApp.WebAPI.Controllers
         /// <response code="400">Request contains null object or invalid object type</response>
         /// <response code="500">Unexpected error on the server side.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(EventDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(EventResponceModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Nullable), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Nullable), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Nullable), StatusCodes.Status500InternalServerError)]
