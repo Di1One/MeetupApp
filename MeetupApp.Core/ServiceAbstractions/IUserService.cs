@@ -4,8 +4,6 @@ namespace MeetupApp.Core.ServiceAbstractions
 {
     public interface IUserService
     {
-        //Task<UserDto?> GetUserByIdAsync(Guid id);
-        //Task<IEnumerable<UserDto>> GetAllUsers();
         Task<UserDto?> GetUserByEmailAsync(string email);
         Task<UserDto?> GetUserByRefreshTokenAsync(Guid token);
         Task<bool> IsUserExistsAsync(Guid userId);

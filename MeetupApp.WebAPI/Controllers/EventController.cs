@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
-using MeetupApp.Business.ServicesImplementations;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
