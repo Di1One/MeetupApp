@@ -17,11 +17,13 @@ namespace MeetupApp.WebAPI.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IEventService _eventService;
+        private readonly IUserService _userService;
 
-        public EventController(IMapper mapper, IEventService eventService)
+        public EventController(IMapper mapper, IEventService eventService, IUserService userService)
         {
             _mapper = mapper;
             _eventService = eventService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -51,7 +53,14 @@ namespace MeetupApp.WebAPI.Controllers
                     return NotFound();
                 }
 
-                return Ok(eventDto);
+                var response = _mapper.Map<EventResponceModel>(eventDto);
+
+                if (response == null)
+                {
+                    throw new ArgumentException("The same entry already exists in the storage.", nameof(response));
+                }
+
+                return Ok(response);
             }
             catch (ArgumentNullException ex)
             {
@@ -78,14 +87,30 @@ namespace MeetupApp.WebAPI.Controllers
         /// <response code="500">Unexpected error on the server side.</response>
         [Route("GetAll")]
         [HttpGet]
-        [ProducesResponseType(typeof(List<EventDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<EventResponceModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllEvents()
         {
             var eventDto = await _eventService.GetEventsAsync();
-            return Ok(eventDto);
+
+            var response = new List<EventResponceModel>();
+
+            foreach(var ev in eventDto)
+            {
+                response.Add(_mapper.Map<EventResponceModel>(ev));
+            }
+
+            return Ok(response);
         }
 
+        /// <summary>
+        /// Create new event
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        ///  <response code="200">Returns the event for the authorized user</response>
+        /// <response code="400">Request contains null object or invalid object type</response>
+        /// <response code="500">Unexpected error on the server side.</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
@@ -103,8 +128,15 @@ namespace MeetupApp.WebAPI.Controllers
                 if (isExist)
                     throw new ArgumentException("The same entry already exists in the storage.", nameof(model));
 
+                var isOwnerExist = await _userService.IsUserExistsAsync(eventDto.Name);
+
+                if (isOwnerExist)
+                    throw new ArgumentException("Specified owner doest exist", nameof(model));
+
                 if (eventDto != null)
                 {
+                    var user = await _userService.GetUserByEmailAsync(eventDto.Owner);
+                    eventDto.UserId = user.Id;
                     var result = await _eventService.CreateEventAsync(eventDto);
 
                     return CreatedAtAction(nameof(CreateEvent), new { id = model });

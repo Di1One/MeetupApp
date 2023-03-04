@@ -1,6 +1,6 @@
-﻿namespace MeetupApp.WebAPI.Models.Requests
+﻿namespace MeetupApp.WebAPI.Models.Responces
 {
-    public class GetEventsRequestModel
+    public class EventResponceModel
     {
         public string Name { get; set; }
         public string Description { get; set; }
