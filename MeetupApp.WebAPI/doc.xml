@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MeetupApp.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="M:MeetupApp.WebAPI.Controllers.EventController.GetEventById(System.Guid)">
+            <summary>
+            Get the event by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <response code="200">Returns the event for the authorized user</response>
+            <response code="400">Request contains null object or invalid object type</response>
+            <response code="500">Unexpected error on the server side.</response>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.EventController.GetAllEvents">
+            <summary>
+            Get all event
+            </summary>
+            <returns></returns>
+            <response code="200">Returns all events for the authorized user</response>
+            <response code="500">Unexpected error on the server side.</response>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.EventController.CreateEvent(MeetupApp.WebAPI.Models.Requests.AddorUpdateEventRequestModel)">
+            <summary>
+            Create new event
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+             <response code="200">Returns the event for the authorized user</response>
+            <response code="400">Request contains null object or invalid object type</response>
+            <response code="500">Unexpected error on the server side.</response>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.EventController.UpdateEvent(System.Guid,MeetupApp.WebAPI.Models.Requests.AddorUpdateEventRequestModel)">
+            <summary>
+            Update event 
+            </summary>
+            <param name="id"></param>
+            <param name="model"></param>
+            <returns></returns>
+            <response code="200">Returns updated event for the authorized user</response>
+            <response code="400">Request contains null object or invalid object type</response>
+            <response code="500">Unexpected error on the server side.</response>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.EventController.DeleteEvent(System.Guid)">
+            <summary>
+            Delete the event by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <response code="400">Request contains null object or invalid object type</response>
+            <response code="500">Unexpected error on the server side.</response>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.TokenController.CreateJwtToken(MeetupApp.WebAPI.Models.Requests.LoginUserRequestModel)">
+            <summary>
+            Create new access token for the login data model
+            </summary>
+            <param name="request">login model</param>
+            <returns>An access token for an authorized user.</returns>
+            <response code="200">Returns the access token for the authorized user</response>
+            <response code="400">Request contains null object or invalid object type</response>
+            <response code="500">Unexpected error on the server side.</response>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.TokenController.RefreshToken(MeetupApp.WebAPI.Models.Requests.RefreshTokenRequestModel)">
+            <summary>
+            Create new token by refresh token.
+            </summary>
+            <param name="request">a refresh token value</param>
+            <returns>new access token for authorized user</returns>
+            <response code="200">Returns the access token for the authorized user</response>
+            <response code="400">Request contains null object or invalid object type</response>
+            <response code="500">Unexpected error on the server side.</response>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.TokenController.RevokeToken(MeetupApp.WebAPI.Models.Requests.RefreshTokenRequestModel)">
+            <summary>
+            Revoke access token by the refresh token value
+            </summary>
+            <param name="request">a refresh token value</param>
+            <returns>The Ok status</returns>
+            <response code="200">an empty</response>
+            <response code="400">Request contains null object or invalid object type</response>
+            <response code="500">Unexpected error on the server side.</response>
+        </member>
+        <member name="T:MeetupApp.WebAPI.Controllers.UserController">
+            <summary>
+            Controller that provides API endpoints for the User resource.
+            </summary>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.UserController.Create(MeetupApp.WebAPI.Models.Requests.RegisterUserRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MeetupApp.WebAPI.Models.Requests.AddorUpdateEventRequestModel">
+            <summary>
+            Model for request creating or modifying an event
+            </summary>
+        </member>
+        <member name="T:MeetupApp.WebAPI.Models.Requests.LoginUserRequestModel">
+            <summary>
+            Login model
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Requests.LoginUserRequestModel.Email">
+            <summary>
+            User email
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Requests.LoginUserRequestModel.Password">
+            <summary>
+            User password
+            </summary>
+        </member>
+        <member name="T:MeetupApp.WebAPI.Models.Requests.RefreshTokenRequestModel">
+            <summary>
+            Model for request new access token by the refresh token value
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Requests.RefreshTokenRequestModel.RefreshToken">
+            <summary>
+            Refresh token value
+            </summary>
+        </member>
+        <member name="T:MeetupApp.WebAPI.Models.Requests.RegisterUserRequestModel">
+            <summary>
+            Register model
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Requests.RegisterUserRequestModel.Email">
+            <summary>
+            User email
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Requests.RegisterUserRequestModel.Password">
+            <summary>
+            User password
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Requests.RegisterUserRequestModel.PasswordConfirmation">
+            <summary>
+            Confirmation of the user password
+            </summary>
+        </member>
+        <member name="T:MeetupApp.WebAPI.Models.Responces.ErrorModel">
+            <summary>
+            Model for returning errors from api
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Responces.ErrorModel.Message">
+            <summary>
+            Error message
+            </summary>
+        </member>
+        <member name="T:MeetupApp.WebAPI.Models.Responces.TokenResponseModel">
+            <summary>
+            Model for returning access token from API
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Responces.TokenResponseModel.AccessToken">
+            <summary>
+            An access token as a string.
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Responces.TokenResponseModel.Role">
+            <summary>
+            Role name for current user
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Responces.TokenResponseModel.UserId">
+            <summary>
+            Unique identifier of the user for which the access token was created
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Responces.TokenResponseModel.TokenExpiration">
+            <summary>
+            Token expiration
+            </summary>
+        </member>
+        <member name="P:MeetupApp.WebAPI.Models.Responces.TokenResponseModel.RefreshToken">
+            <summary>
+            Refresh token value
+            </summary>
+        </member>
+    </members>
+</doc>
