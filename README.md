@@ -62,7 +62,7 @@ You need to specify the path to the file in which the documentation will be save
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     ...
-    <DocumentationFile>C:\Users\user\source\repos\ElectronicsStore\WebAPI\ElectronicsStore.WebAPI\doc.xml</DocumentationFile>
+    <DocumentationFile>E:\C#\AspNetNewsAgregator\AspNetNewsAgregator.WebAPI\doc.xml</DocumentationFile>
   </PropertyGroup>
   ...
 </Project>
