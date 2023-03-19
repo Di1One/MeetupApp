@@ -9,10 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Serilog;
 using Serilog.Events;
-using System.Reflection;    
+using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Win32;
-using System.Runtime.CompilerServices;
 using Microsoft.OpenApi.Models;
 
 namespace MeetupApp.WebAPI.Extensions
@@ -23,8 +21,7 @@ namespace MeetupApp.WebAPI.Extensions
         {
             host.UseSerilog((ctx, lc) => lc
               .WriteTo.Console()
-              .WriteTo.File(GetPathToLogFile(),
-                  LogEventLevel.Information));
+              .WriteTo.File(GetPathToLogFile(), LogEventLevel.Information));
         }
 
         // Returns the path for log file recording.

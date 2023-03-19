@@ -138,7 +138,9 @@ namespace MeetupApp.WebAPI.Controllers
                     eventDto.UserId = user.Id;
                     var result = await _eventService.CreateEventAsync(eventDto);
 
-                    return CreatedAtAction(nameof(CreateEvent), model);
+                    var response = _mapper.Map<EventResponceModel>(eventDto);
+
+                    return CreatedAtAction(nameof(CreateEvent), response);
                 }
 
                 return BadRequest();
