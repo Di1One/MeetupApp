@@ -36,11 +36,11 @@ namespace MeetupApp.Business.ServicesImplementations
         public async Task<UserDto?> GetUserByRefreshTokenAsync(Guid refreshToken)
         {
             var token = await _unitOfWork.RefreshToken
-            .Get()
-            .Include(token => token.User)
-            .ThenInclude(user => user.Role)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(token => token.Token.Equals(refreshToken));
+                .Get()
+                .Include(token => token.User)
+                .ThenInclude(user => user.Role)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(token => token.Token.Equals(refreshToken));
 
             if (token != null) return _mapper.Map<UserDto>(token.User);
 

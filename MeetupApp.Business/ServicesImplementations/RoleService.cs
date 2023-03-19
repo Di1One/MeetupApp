@@ -11,7 +11,7 @@ namespace MeetupApp.Business.ServicesImplementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
 
-        public RoleService(IUnitOfWork unitOfWork, IConfiguration configuration = null)
+        public RoleService(IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
@@ -21,18 +21,21 @@ namespace MeetupApp.Business.ServicesImplementations
         {
             var roleNameByDefault = GetDefaultRoleNameForUser();
             var role = await _unitOfWork.Roles
-                .FindBy(r =>
-                    r.Name.Equals(roleNameByDefault))
-                .AsNoTracking().FirstOrDefaultAsync();
+                .FindBy(r => r.Name.Equals(roleNameByDefault))
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
             if (role == null)
                 throw new ArgumentException(
                     $"There is no entry in the database matching the default role value: {nameof(roleNameByDefault)}");
 
             return role.Id;
         }
+
         private string GetDefaultRoleNameForUser()
         {
             var roleName = _configuration["RoleByDefault"];
+
             if (roleName == null)
                 throw new JsonException(
                     "Failed to retrieve a valid default role value.");
