@@ -9,13 +9,13 @@ namespace MeetupApp.Data.Repositories
     {
         private readonly MeetupAppDbContext _dbContext;
         public IRepository<User> Users { get; }
-        public IRepository<Role> Roles { get; }
+        public IRoleRepository Roles { get; }
         public IRepository<Event> Events { get; }
         public IRepository<RefreshToken> RefreshToken { get; }
 
         public UnitOfWork(MeetupAppDbContext dbContext,
             IRepository<User> users,
-            IRepository<Role> roles,
+            IRoleRepository roles,
             IRepository<RefreshToken> refreshToken,
             IRepository<Event> events)
         {
