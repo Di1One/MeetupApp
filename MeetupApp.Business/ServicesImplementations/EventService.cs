@@ -5,6 +5,8 @@ using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.Data.Abstractions;
 using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using System;
 
 namespace MeetupApp.Business.ServicesImplementations
 {
@@ -75,14 +77,27 @@ namespace MeetupApp.Business.ServicesImplementations
         {
             var entity = await _unitOfWork.Events.GetByIdAsync(id);
 
-            if (entity != null)
+            try
             {
-                _unitOfWork.Events.Remove(entity);
-                return await _unitOfWork.Commit();
+                if (entity != null)
+                {
+                    _unitOfWork.Events.Remove(entity);
+                    return await _unitOfWork.Commit();
+                }
+                else
+                {
+                    throw new ArgumentException("Event for removing doesn't exist.", nameof(id));
+                }
             }
-            else
+            catch (ArgumentException ex)
             {
-                throw new ArgumentException("Event for removing doesn't exist.", nameof(id));
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return 0;
+            }
+            catch(Exception ex) 
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return 0;
             }
         }
 

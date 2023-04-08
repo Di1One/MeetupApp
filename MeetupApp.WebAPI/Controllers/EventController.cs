@@ -276,38 +276,21 @@ namespace MeetupApp.WebAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        /// <response code="400">Request contains null object or invalid object type</response>
-        /// <response code="500">Unexpected error on the server side.</response>
+        /// <response code="204">Event was deleted</response>
+        /// <response code="400">Request contains null object or invalid object type.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteEvent(Guid id)
         {
-            try
+            var result = await _eventService.DeleteEventAsync(id);
+
+            if (result != 0)
             {
-                if (id.Equals(default))
-                    throw new ArgumentNullException(nameof(id), "A non-empty Id is required.");
-
-                await _eventService.DeleteEventAsync(id);
-
                 return NoContent();
             }
-            catch (ArgumentNullException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return StatusCode(500);
-            }
+
+            return BadRequest();
         }
     }
 }
