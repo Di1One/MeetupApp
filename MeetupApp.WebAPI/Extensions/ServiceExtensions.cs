@@ -39,7 +39,7 @@ namespace MeetupApp.WebAPI.Extensions
         {
             collection.AddScoped<IRepository<User>, Repository<User>>();
             collection.AddScoped<IRoleRepository, RoleRepository>();
-            collection.AddScoped<IRepository<RefreshToken>, Repository<RefreshToken>>();
+            collection.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             collection.AddScoped<IRepository<Event>, Repository<Event>>();
             collection.AddScoped<IUnitOfWork, UnitOfWork>();
         }

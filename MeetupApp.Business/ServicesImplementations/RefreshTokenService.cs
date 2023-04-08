@@ -23,7 +23,7 @@ namespace MeetupApp.Business.ServicesImplementations
                 UserId = userId
             };
 
-            await _unitOfWork.RefreshToken.AddAsync(rt);
+            await _unitOfWork.RefreshToken.AddTokenAsync(rt);
             var result = await _unitOfWork.Commit();
             return result;
         }
@@ -31,11 +31,11 @@ namespace MeetupApp.Business.ServicesImplementations
         public async Task<int> RemoveRefreshTokenAsync(Guid tokenValue)
         {
             var token = await _unitOfWork.RefreshToken
-                .Get()
+                .GetAllToken()
                 .FirstOrDefaultAsync(token => token.Token.Equals(tokenValue));
 
             if (token != null)
-                _unitOfWork.RefreshToken.Remove(token);
+                _unitOfWork.RefreshToken.RemoveToken(token);
 
             return await _unitOfWork.Commit();
         }
