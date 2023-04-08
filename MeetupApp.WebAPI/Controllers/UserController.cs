@@ -4,7 +4,6 @@ using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
 using MeetupApp.WebAPI.Utils;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 

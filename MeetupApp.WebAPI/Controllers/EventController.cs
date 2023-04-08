@@ -118,7 +118,7 @@ namespace MeetupApp.WebAPI.Controllers
         {
             try
             {
-                if (model == null)
+                if (!ModelState.IsValid)
                     throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
 
                 var eventDto = _mapper.Map<EventDto>(model);
