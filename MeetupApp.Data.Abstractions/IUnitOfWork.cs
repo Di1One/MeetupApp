@@ -6,9 +6,9 @@ namespace MeetupApp.Data.Abstractions
     public interface IUnitOfWork
     {
         IRepository<User> Users { get; }
-        IRepository<Role> Roles { get; }
+        IRoleRepository Roles { get; }
         IRepository<Event> Events { get; }
-        IRepository<RefreshToken> RefreshToken { get; }
+        IRefreshTokenRepository RefreshToken { get; }
         Task<int> Commit();
     }
 }

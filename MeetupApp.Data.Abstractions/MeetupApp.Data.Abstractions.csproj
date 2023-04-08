@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\MeetupApp.Core\MeetupApp.Core.csproj" />
     <ProjectReference Include="..\MeetupApp.DataBase\MeetupApp.DataBase.csproj" />
   </ItemGroup>

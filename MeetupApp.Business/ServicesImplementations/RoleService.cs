@@ -21,7 +21,7 @@ namespace MeetupApp.Business.ServicesImplementations
         {
             var roleNameByDefault = GetDefaultRoleNameForUser();
             var role = await _unitOfWork.Roles
-                .FindBy(r => r.Name.Equals(roleNameByDefault))
+                .FindByRoleName(r => r.Name.Equals(roleNameByDefault))
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
