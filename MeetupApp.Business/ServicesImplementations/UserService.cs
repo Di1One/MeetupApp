@@ -25,9 +25,12 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
-            var user = await _unitOfWork.Users.GetByEmailAsync(email);    
+            var user = await _unitOfWork.Users.FindBy(us => us.Email.Equals(email), us => us.Role)
+                .AsNoTracking()
+                .Select(user => _mapper.Map<UserDto>(user))
+                .FirstOrDefaultAsync();
 
-            if (user != null) return _mapper.Map<UserDto>(user);
+            if (user != null) return user;
 
             throw new ArgumentException("User with specified email doesn't exist. ", nameof(email));
         }

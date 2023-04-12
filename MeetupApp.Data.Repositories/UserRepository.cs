@@ -22,10 +22,18 @@ namespace MeetupApp.Data.Repositories
             await DbSet.AddAsync(entity);
         }
 
-        //public IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression, params Expression<Func<User, object>>[] includes)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression, params Expression<Func<User, object>>[] includes)
+        {
+            var result = DbSet.Where(searchExpression);
+
+            if (includes.Any())
+            {
+                result = includes.Aggregate(result, (current, include) =>
+                    current.Include(include));
+            }
+
+            return result;
+        }
 
         public IQueryable<User> Get()
         {
@@ -37,12 +45,6 @@ namespace MeetupApp.Data.Repositories
             return await DbSet
                 .AsNoTracking()
                 .FirstOrDefaultAsync(entity => entity.Id.Equals(id));
-        }
-        public async Task<User> GetByEmailAsync(string email)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .FirstOrDefaultAsync(entity => entity.Email.Equals(email));
         }
     }
 }

@@ -43,7 +43,7 @@ namespace MeetupApp.WebAPI.Controllers
                 var userDto = _mapper.Map<UserDto>(request);
                 var userWithSameEmailExists = await _userService.IsUserExistsAsync(request.Email);
 
-                if (userWithSameEmailExists
+                if (!userWithSameEmailExists
                     && request.Password.Equals(request.PasswordConfirmation))
                 {
                     var result = await _userService.RegisterUserAsync(userDto, request.Password);
