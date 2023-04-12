@@ -7,10 +7,11 @@ namespace MeetupApp.Data.Abstractions.Repositories
     {
         //READ
         Task<User> GetByIdAsync(Guid id);
+        Task<User> GetByEmailAsync(string email);
         IQueryable<User> Get();
 
-        IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression,
-            params Expression<Func<User, object>>[] includes);
+        //IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression,
+        //    params Expression<Func<User, object>>[] includes);
 
         //CREATE
         Task AddAsync(User entity);

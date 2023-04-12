@@ -22,10 +22,10 @@ namespace MeetupApp.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression, params Expression<Func<User, object>>[] includes)
-        {
-            throw new NotImplementedException();
-        }
+        //public IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression, params Expression<Func<User, object>>[] includes)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public IQueryable<User> Get()
         {
@@ -35,6 +35,12 @@ namespace MeetupApp.Data.Repositories
         public Task<User> GetByIdAsync(Guid id)
         {
             throw new NotImplementedException();
+        }
+        public async Task<User> GetByEmailAsync(string email)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(entity => entity.Email.Equals(email));
         }
     }
 }

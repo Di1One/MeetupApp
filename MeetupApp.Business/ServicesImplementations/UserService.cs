@@ -13,22 +13,21 @@ namespace MeetupApp.Business.ServicesImplementations
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IRoleService _roleService;
 
-        public UserService(IMapper mapper, IConfiguration configuration, IUnitOfWork unitOfWork)
+        public UserService(IMapper mapper, IConfiguration configuration, IUnitOfWork unitOfWork, IRoleService roleService)
         {
             _mapper = mapper;
             _configuration = configuration;
             _unitOfWork = unitOfWork;
+            _roleService = roleService;
         }
 
         public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
-            var user = await _unitOfWork.Users.FindBy(us => us.Email.Equals(email),us => us.Role)
-                .AsNoTracking()
-                .Select(user => _mapper.Map<UserDto>(user))
-                .FirstOrDefaultAsync();
+            var user = await _unitOfWork.Users.GetByEmailAsync(email);    
 
-            if (user != null) return user;
+            if (user != null) return _mapper.Map<UserDto>(user);
 
             throw new ArgumentException("User with specified email doesn't exist. ", nameof(email));
         }
@@ -76,6 +75,9 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<int> RegisterUserAsync(UserDto dto, string password)
         {
+            var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
+            dto.RoleId = userRoleId;
+
             var user = _mapper.Map<User>(dto);
 
             user.PasswordHash = CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}");
