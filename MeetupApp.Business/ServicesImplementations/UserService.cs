@@ -5,6 +5,7 @@ using MeetupApp.Data.Abstractions;
 using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace MeetupApp.Business.ServicesImplementations
 {
@@ -49,11 +50,6 @@ namespace MeetupApp.Business.ServicesImplementations
             throw new ArgumentException("Could not find a token with the specified model . ", nameof(refreshToken));
         }
 
-        public async Task<bool> IsUserExistsAsync(Guid userId)
-        {
-            return await _unitOfWork.Users.Get().AnyAsync(user => user.Id.Equals(userId));
-        }
-
         public async Task<bool> IsUserExistsAsync(string email)
         {
             return await _unitOfWork.Users.Get().AnyAsync(user => user.Email.Equals(email));
@@ -69,24 +65,25 @@ namespace MeetupApp.Business.ServicesImplementations
             return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
         }
 
-        public async Task<bool> CheckUserPasswordAsync(Guid userId, string password)
-        {
-            var dbPasswordHash = (await _unitOfWork.Users.GetByIdAsync(userId))?.PasswordHash;
-
-            return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
-        }
-
         public async Task<int> RegisterUserAsync(UserDto dto, string password)
         {
-            var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
-            dto.RoleId = userRoleId;
+            try
+            {
+                var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
+                dto.RoleId = userRoleId;
 
-            var user = _mapper.Map<User>(dto);
+                var user = _mapper.Map<User>(dto);
 
-            user.PasswordHash = CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}");
+                user.PasswordHash = CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}");
 
-            await _unitOfWork.Users.AddAsync(user);
-            return await _unitOfWork.Commit();
+                await _unitOfWork.Users.AddAsync(user);
+                return await _unitOfWork.Commit();
+            }
+            catch (Exception ex) 
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return 0;
+            }
         }
 
         private string CreateMd5(string password)

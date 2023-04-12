@@ -114,6 +114,7 @@ namespace MeetupApp.WebAPI.Controllers
         /// <response code="500">Unexpected error on the server side.</response>
         [Route("Revoke")]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RevokeToken([FromBody] RefreshTokenRequestModel request)
