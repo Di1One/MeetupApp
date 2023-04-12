@@ -1,7 +1,6 @@
 ﻿using MeetupApp.Data.Abstractions.Repositories;
 using MeetupApp.Data.Abstractions;
 using MeetupApp.Data.Repositories;
-using MeetupApp.DataBase.Entities;
 using MeetupApp.Business.ServicesImplementations;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Utils;
@@ -37,10 +36,10 @@ namespace MeetupApp.WebAPI.Extensions
 
         public static void RegisterRepositories(this IServiceCollection collection)
         {
-            collection.AddScoped<IRepository<User>, Repository<User>>();
+            collection.AddScoped<IUserRepository, UserRepository>();
             collection.AddScoped<IRoleRepository, RoleRepository>();
             collection.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            collection.AddScoped<IRepository<Event>, Repository<Event>>();
+            collection.AddScoped<IEventRepository, EventRepository>();
             collection.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 

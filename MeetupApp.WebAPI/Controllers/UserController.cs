@@ -17,14 +17,12 @@ namespace MeetupApp.WebAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
         private readonly IMapper _mapper;
         private readonly IJwtUtil _jwtUtil;
 
-        public UserController(IUserService userService, IRoleService roleService, IMapper mapper, IJwtUtil jwtUtil)
+        public UserController(IUserService userService, IMapper mapper, IJwtUtil jwtUtil)
         {
             _userService = userService;
-            _roleService = roleService;
             _mapper = mapper;
             _jwtUtil = jwtUtil;
         }
@@ -36,21 +34,18 @@ namespace MeetupApp.WebAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] RegisterUserRequestModel request)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
                 var userDto = _mapper.Map<UserDto>(request);
                 var userWithSameEmailExists = await _userService.IsUserExistsAsync(request.Email);
 
-                if (userDto != null
-                    && !userWithSameEmailExists
+                if (!userWithSameEmailExists
                     && request.Password.Equals(request.PasswordConfirmation))
                 {
-                    userDto.RoleId = userRoleId;
                     var result = await _userService.RegisterUserAsync(userDto, request.Password);
 
                     if (result > 0)
@@ -63,12 +58,11 @@ namespace MeetupApp.WebAPI.Controllers
                     }
                 }
 
-                return BadRequest();
+                return Conflict();
             }
-            catch (Exception e)
+            else
             {
-                Log.Error(e.Message);
-                return StatusCode(500);
+                return BadRequest();
             }
         }
     }
