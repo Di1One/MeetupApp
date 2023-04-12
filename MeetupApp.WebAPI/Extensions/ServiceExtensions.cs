@@ -1,7 +1,6 @@
 ﻿using MeetupApp.Data.Abstractions.Repositories;
 using MeetupApp.Data.Abstractions;
 using MeetupApp.Data.Repositories;
-using MeetupApp.DataBase.Entities;
 using MeetupApp.Business.ServicesImplementations;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Utils;
