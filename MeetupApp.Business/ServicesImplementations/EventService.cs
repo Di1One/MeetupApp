@@ -23,7 +23,7 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<EventDto> GetEventByIdAsync(Guid id)
         {
-            var entity = await _unitOfWork.Events.GetByIdAsync(id);
+            var entity = await _unitOfWork.Events.GetEventByIdAsync(id);
 
             if (entity == null)
                 throw new ArgumentException("Failed to find record in the database that match the specified id. ", nameof(id));
@@ -34,7 +34,7 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<List<EventDto>> GetEventsAsync()
         {
-            var events = await _unitOfWork.Events.Get().ToListAsync();
+            var events = await _unitOfWork.Events.GetAllEvent().ToListAsync();
 
             return _mapper.Map<List<EventDto>>(events);
         }
@@ -47,7 +47,7 @@ namespace MeetupApp.Business.ServicesImplementations
             if (entity == null)
                 throw new ArgumentException("Mapping EventDto to Event was not possible.", nameof(dto));
 
-            await _unitOfWork.Events.AddAsync(entity);
+            await _unitOfWork.Events.AddEventAsync(entity);
             return await _unitOfWork.Commit();
         }
 
@@ -75,13 +75,13 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<int> DeleteEventAsync(Guid id)
         {
-            var entity = await _unitOfWork.Events.GetByIdAsync(id);
+            var entity = await _unitOfWork.Events.GetEventByIdAsync(id);
 
             try
             {
                 if (entity != null)
                 {
-                    _unitOfWork.Events.Remove(entity);
+                    _unitOfWork.Events.RemoveEvent(entity);
                     return await _unitOfWork.Commit();
                 }
                 else
@@ -103,7 +103,7 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<bool> IsEventExistAsync(string name)
         {
-            return await _unitOfWork.Events.Get().AnyAsync(ev => ev.Name.Equals(name));
+            return await _unitOfWork.Events.GetAllEvent().AnyAsync(ev => ev.Name.Equals(name));
         }
     }
 }

@@ -7,7 +7,7 @@ namespace MeetupApp.Data.Abstractions
     {
         IRepository<User> Users { get; }
         IRoleRepository Roles { get; }
-        IRepository<Event> Events { get; }
+        IEventRepository Events { get; }
         IRefreshTokenRepository RefreshToken { get; }
         Task<int> Commit();
     }

@@ -50,8 +50,8 @@
             </summary>
             <param name="id"></param>
             <returns></returns>
-            <response code="400">Request contains null object or invalid object type</response>
-            <response code="500">Unexpected error on the server side.</response>
+            <response code="204">Event was deleted</response>
+            <response code="400">Request contains null object or invalid object type.</response>
         </member>
         <member name="M:MeetupApp.WebAPI.Controllers.TokenController.CreateJwtToken(MeetupApp.WebAPI.Models.Requests.LoginUserRequestModel)">
             <summary>
