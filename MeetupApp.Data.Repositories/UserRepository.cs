@@ -17,9 +17,9 @@ namespace MeetupApp.Data.Repositories
             DbSet = database.Set<User>();
         }
 
-        public Task AddAsync(User entity)
+        public async Task AddAsync(User entity)
         {
-            throw new NotImplementedException();
+            await DbSet.AddAsync(entity);
         }
 
         //public IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression, params Expression<Func<User, object>>[] includes)
@@ -29,12 +29,14 @@ namespace MeetupApp.Data.Repositories
 
         public IQueryable<User> Get()
         {
-            throw new NotImplementedException();
+            return DbSet;
         }
 
-        public Task<User> GetByIdAsync(Guid id)
+        public async Task<User> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await DbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(entity => entity.Id.Equals(id));
         }
         public async Task<User> GetByEmailAsync(string email)
         {
