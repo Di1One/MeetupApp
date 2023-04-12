@@ -37,7 +37,7 @@ namespace MeetupApp.WebAPI.Extensions
 
         public static void RegisterRepositories(this IServiceCollection collection)
         {
-            collection.AddScoped<IRepository<User>, Repository<User>>();
+            collection.AddScoped<IUserRepository, UserRepository>();
             collection.AddScoped<IRoleRepository, RoleRepository>();
             collection.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             collection.AddScoped<IEventRepository, EventRepository>();
