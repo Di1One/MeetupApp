@@ -160,4 +160,4 @@ The **MeetupApp.WebAPI** contains four controllers:
 
 ## Key features:
 
-ASP.Net Core WebAPI, Entity Framework Core, Microsoft SQL Server, C#, Serilog, Automapper, Dependepcy Injection, Generic Repository.
+ASP.Net Core WebAPI, Entity Framework Core, Microsoft SQL Server, C#, Serilog, Automapper, Dependepcy Injection, Repository.
