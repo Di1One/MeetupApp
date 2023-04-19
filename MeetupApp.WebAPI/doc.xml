@@ -69,6 +69,7 @@
             <param name="request">a refresh token value</param>
             <returns>new access token for authorized user</returns>
             <response code="200">Returns the access token for the authorized user</response>
+            <response code="404">Server cannot find the requested resource</response>
             <response code="400">Request contains null object or invalid object type</response>
         </member>
         <member name="M:MeetupApp.WebAPI.Controllers.TokenController.RevokeToken(MeetupApp.WebAPI.Models.Requests.RefreshTokenRequestModel)">
@@ -78,8 +79,8 @@
             <param name="request">a refresh token value</param>
             <returns>The Ok status</returns>
             <response code="200">an empty</response>
+            <response code="404">Server cannot find the requested resource</response>
             <response code="400">Request contains null object or invalid object type</response>
-            <response code="500">Unexpected error on the server side.</response>
         </member>
         <member name="T:MeetupApp.WebAPI.Controllers.UserController">
             <summary>
