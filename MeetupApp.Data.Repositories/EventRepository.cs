@@ -3,6 +3,7 @@ using MeetupApp.Data.Abstractions.Repositories;
 using MeetupApp.DataBase;
 using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace MeetupApp.Data.Repositories
 {
@@ -31,7 +32,15 @@ namespace MeetupApp.Data.Repositories
 
         public async Task AddEventAsync(Event entity)
         {
-            await DbSet.AddAsync(entity);
+            try
+            {
+                await DbSet.AddAsync(entity);
+                Log.Information($"Event with {entity.Id} was added.");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+            }
         }
 
         public void Update(Event entity)
@@ -55,7 +64,15 @@ namespace MeetupApp.Data.Repositories
 
         public void RemoveEvent(Event entity)
         {
-            DbSet.Remove(entity);
+            try
+            {
+                DbSet.Remove(entity);
+                Log.Information($"Event with {entity.Id} was deleted.");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+            }
         }
 
     }
