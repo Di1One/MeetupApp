@@ -58,9 +58,16 @@ namespace MeetupApp.WebAPI.Utils
             };
         }
 
-        public async Task RemoveRefreshTokenAsync(Guid requestRefreshToken)
+        public async Task<bool> RemoveRefreshTokenAsync(Guid requestRefreshToken)
         {
-            await _refreshTokenService.RemoveRefreshTokenAsync(requestRefreshToken);
+            var result = await _refreshTokenService.RemoveRefreshTokenAsync(requestRefreshToken);
+
+            if (result == 0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

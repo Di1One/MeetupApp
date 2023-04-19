@@ -5,7 +5,6 @@ using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
 using MeetupApp.WebAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace MeetupApp.WebAPI.Controllers
 {

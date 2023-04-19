@@ -6,6 +6,6 @@ namespace MeetupApp.WebAPI.Utils
     public interface IJwtUtil
     {
         Task<TokenResponseModel> GenerateTokenAsync(UserDto dto);
-        Task RemoveRefreshTokenAsync(Guid requestRefreshToken);
+        Task<bool> RemoveRefreshTokenAsync(Guid requestRefreshToken);
     }
 }

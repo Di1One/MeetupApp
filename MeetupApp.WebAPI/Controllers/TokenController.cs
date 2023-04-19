@@ -28,17 +28,22 @@ namespace MeetupApp.WebAPI.Controllers
         /// <param name="request">login model</param>
         /// <returns>An access token for an authorized user.</returns>
         /// <response code="200">Returns the access token for the authorized user</response>
+        /// <response code="404">Server cannot find the requested resource</response>
         /// <response code="400">Request contains null object or invalid object type</response>
-        /// <response code="500">Unexpected error on the server side.</response>
         [HttpPost]
         [ProducesResponseType(typeof(TokenResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateJwtToken([FromBody] LoginUserRequestModel request)
         {
-            try
-            {
+            if (ModelState.IsValid) 
+            { 
                 var user = await _userService.GetUserByEmailAsync(request.Email);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
                 var isPassCorrect = await _userService.CheckUserPasswordAsync(request.Email, request.Password);
 
@@ -53,16 +58,8 @@ namespace MeetupApp.WebAPI.Controllers
 
                 return Ok(response);
             }
-            catch (ArgumentException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return StatusCode(500);
-            }
+            
+            return BadRequest();
         }
 
 
@@ -72,36 +69,32 @@ namespace MeetupApp.WebAPI.Controllers
         /// <param name="request">a refresh token value</param>
         /// <returns>new access token for authorized user</returns>
         /// <response code="200">Returns the access token for the authorized user</response>
+        /// <response code="404">Server cannot find the requested resource</response>
         /// <response code="400">Request contains null object or invalid object type</response>
-        /// <response code="500">Unexpected error on the server side.</response>
         [Route("Refresh")]
         [HttpPost]
         [ProducesResponseType(typeof(TokenResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestModel request)
         {
-            try
-            {
+            if (ModelState.IsValid) 
+            { 
                 var user = await _userService.GetUserByRefreshTokenAsync(request.RefreshToken);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
                 var response = await _jwtUtil.GenerateTokenAsync(user);
 
                 await _jwtUtil.RemoveRefreshTokenAsync(request.RefreshToken);
 
                 return Ok(response);
+            }
 
-            }
-            catch (ArgumentException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return StatusCode(500);
-            }
+            return BadRequest();
         }
 
         /// <summary>
@@ -110,30 +103,28 @@ namespace MeetupApp.WebAPI.Controllers
         /// <param name="request">a refresh token value</param>
         /// <returns>The Ok status</returns>
         /// <response code="200">an empty</response>
+        /// <response code="404">Server cannot find the requested resource</response>
         /// <response code="400">Request contains null object or invalid object type</response>
-        /// <response code="500">Unexpected error on the server side.</response>
         [Route("Revoke")]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RevokeToken([FromBody] RefreshTokenRequestModel request)
         {
-            try
+            if (ModelState.IsValid)
             {
-                await _jwtUtil.RemoveRefreshTokenAsync(request.RefreshToken);
-                return Ok();
+                bool isTokenRevoked = await _jwtUtil.RemoveRefreshTokenAsync(request.RefreshToken);
 
+                if (!isTokenRevoked)
+                {
+                    return NotFound();
+                }
+
+                return Ok();
             }
-            catch (ArgumentException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return StatusCode(500);
-            }
+
+            return BadRequest();
         }
     }
 }

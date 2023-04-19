@@ -5,6 +5,8 @@ using MeetupApp.Data.Abstractions;
 using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Serilog;
+using System;
 
 namespace MeetupApp.Business.ServicesImplementations
 {
@@ -25,33 +27,54 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
-            var user = await _unitOfWork.Users.FindBy(us => us.Email.Equals(email), us => us.Role)
-                .AsNoTracking()
-                .Select(user => _mapper.Map<UserDto>(user))
-                .FirstOrDefaultAsync();
+            try
+            {
+                var user = await _unitOfWork.Users.FindBy(us => us.Email.Equals(email), us => us.Role)
+                    .AsNoTracking()
+                    .Select(user => _mapper.Map<UserDto>(user))
+                    .FirstOrDefaultAsync();
 
-            if (user != null) return user;
+                if (user != null) return user;
 
-            throw new ArgumentException("User with specified email doesn't exist. ", nameof(email));
+                throw new ArgumentException("User with specified email doesn't exist. ", nameof(email));
+            }
+            catch(ArgumentException ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return null;
+            }
+            catch(Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return null;
+            }
         }
 
         public async Task<UserDto?> GetUserByRefreshTokenAsync(Guid refreshToken)
         {
-            var token = await _unitOfWork.RefreshToken
-                .GetAllToken()
-                .Include(token => token.User)
-                .ThenInclude(user => user.Role)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(token => token.Token.Equals(refreshToken));
+            try
+            {
+                var token = await _unitOfWork.RefreshToken
+                    .GetAllToken()
+                    .Include(token => token.User)
+                    .ThenInclude(user => user.Role)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(token => token.Token.Equals(refreshToken));
 
-            if (token != null) return _mapper.Map<UserDto>(token.User);
+                if (token != null) return _mapper.Map<UserDto>(token.User);
 
-            throw new ArgumentException("Could not find a token with the specified model . ", nameof(refreshToken));
-        }
-
-        public async Task<bool> IsUserExistsAsync(Guid userId)
-        {
-            return await _unitOfWork.Users.Get().AnyAsync(user => user.Id.Equals(userId));
+                throw new ArgumentException("Could not find a token with the specified model . ", nameof(refreshToken));
+            }
+            catch(ArgumentException ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return null;
+            }
+            catch(Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return null;
+            }
         }
 
         public async Task<bool> IsUserExistsAsync(string email)
@@ -69,24 +92,25 @@ namespace MeetupApp.Business.ServicesImplementations
             return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
         }
 
-        public async Task<bool> CheckUserPasswordAsync(Guid userId, string password)
-        {
-            var dbPasswordHash = (await _unitOfWork.Users.GetByIdAsync(userId))?.PasswordHash;
-
-            return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
-        }
-
         public async Task<int> RegisterUserAsync(UserDto dto, string password)
         {
-            var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
-            dto.RoleId = userRoleId;
+            try
+            {
+                var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
+                dto.RoleId = userRoleId;
 
-            var user = _mapper.Map<User>(dto);
+                var user = _mapper.Map<User>(dto);
 
-            user.PasswordHash = CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}");
+                user.PasswordHash = CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}");
 
-            await _unitOfWork.Users.AddAsync(user);
-            return await _unitOfWork.Commit();
+                await _unitOfWork.Users.AddAsync(user);
+                return await _unitOfWork.Commit();
+            }
+            catch (Exception ex) 
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return 0;
+            }
         }
 
         private string CreateMd5(string password)

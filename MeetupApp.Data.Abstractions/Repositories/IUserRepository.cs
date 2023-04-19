@@ -6,7 +6,6 @@ namespace MeetupApp.Data.Abstractions.Repositories
     public interface IUserRepository
     {
         //READ
-        Task<User> GetByIdAsync(Guid id);
         IQueryable<User> Get();
 
         IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression,

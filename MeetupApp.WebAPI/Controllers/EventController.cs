@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MeetupApp.Core;
 using MeetupApp.Core.DataTransferObjects;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
@@ -6,6 +7,7 @@ using MeetupApp.WebAPI.Models.Responces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using System.Reflection;
 
 namespace MeetupApp.WebAPI.Controllers
 {
@@ -211,65 +213,72 @@ namespace MeetupApp.WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Edit fields of the event
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="model"></param>
+        /// <response code="200">Returns updated event for the authorized user</response>
+        /// <response code="400">Request contains null object or invalid object type</response>
+        /// <response code="500">Unexpected error on the server side.</response>
+        /// <returns></returns>
+        [HttpPatch("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PatchEvent(Guid id, [FromBody] AddorUpdateEventRequestModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var sourceDto = await _eventService.GetEventByIdAsync(id);
 
-        // todo Add PatchMethod
-        //[HttpPatch("{id}")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
-        //public async Task<IActionResult> PatchEvent(Guid id, [FromBody] AddorUpdateEventRequestModel model)
-        //{
-        //    try
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            var sourceDto = await _eventService.GetEventByIdAsync(id);
+                    var dto = _mapper.Map<EventDto>(model);
+                    dto.UserId = sourceDto.UserId;
+                    dto.Id = id;
 
-        //            var dto = _mapper.Map<EventDto>(model);
-        //            dto.UserId = sourceDto.UserId;
-        //            dto.Id = id;
+                    var patchList = new List<PatchModel>();
 
-        //            var patchList = new List<PatchModel>();
+                    foreach (PropertyInfo property in typeof(EventDto).GetProperties())
+                    {
+                        if (!property.GetValue(dto).Equals(property.GetValue(sourceDto)))
+                        {
+                            patchList.Add(new PatchModel()
+                            {
+                                PropertyName = property.Name,
+                                PropertyValue = property.GetValue(dto)
+                            });
+                        }
+                    }
 
-        //            foreach (PropertyInfo property in typeof(EventDto).GetProperties())
-        //            {
-        //                if (!property.GetValue(dto).Equals(property.GetValue(sourceDto)))
-        //                {
-        //                    patchList.Add(new PatchModel()
-        //                    {
-        //                        PropertyName = property.Name,
-        //                        PropertyValue = property.GetValue(dto)
-        //                    });
-        //                }
-        //            }
+                    if (patchList.Any())
+                    {
+                        await _eventService.PatchEventAsync(id, patchList);
+                    }
+                    else
+                    {
+                        return StatusCode(StatusCodes.Status304NotModified, model);
+                    }
 
-        //            if (patchList.Any())
-        //            {
-        //                await _eventService.PatchEventAsync(id, patchList);
-        //            }
-        //            else
-        //            {
-        //                return StatusCode(StatusCodes.Status304NotModified, model);
-        //            }
+                    var updatedEvent = await _eventService.GetEventByIdAsync(id);
 
-        //            var updatedEvent = await _eventService.GetEventByIdAsync(id);
+                    var responseModel = _mapper.Map<EventResponceModel>(updatedEvent);
 
-        //            var responseModel = _mapper.Map<EventResponceModel>(updatedEvent);
-
-        //            return Ok(responseModel);
-        //        }
-        //        else
-        //        {
-        //            return Ok();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Error(ex.Message);
-        //        return StatusCode(500);
-        //    }
-        //}
+                    return Ok(responseModel);
+                }
+                else
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                return StatusCode(500);
+            }
+        }
 
         /// <summary>
         /// Delete the event by id
