@@ -2,6 +2,7 @@
 using MeetupApp.DataBase;
 using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Linq.Expressions;
 
 namespace MeetupApp.Data.Repositories
@@ -19,7 +20,15 @@ namespace MeetupApp.Data.Repositories
 
         public async Task AddAsync(User entity)
         {
-            await DbSet.AddAsync(entity);
+            try
+            {
+                await DbSet.AddAsync(entity);
+                Log.Information($"User with {entity.Id} was added.");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+            }
         }
 
         public IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression, params Expression<Func<User, object>>[] includes)
@@ -38,13 +47,6 @@ namespace MeetupApp.Data.Repositories
         public IQueryable<User> Get()
         {
             return DbSet;
-        }
-
-        public async Task<User> GetByIdAsync(Guid id)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .FirstOrDefaultAsync(entity => entity.Id.Equals(id));
         }
     }
 }
