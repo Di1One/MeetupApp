@@ -2,11 +2,7 @@
 using MeetupApp.DataBase;
 using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Serilog;
 
 namespace MeetupApp.Data.Repositories
 {
@@ -23,7 +19,15 @@ namespace MeetupApp.Data.Repositories
 
         public async Task AddTokenAsync(RefreshToken entity)
         {
-            await DbSet.AddAsync(entity);
+            try
+            {
+                await DbSet.AddAsync(entity);
+                Log.Information($"Refresh token with {entity.Id} was added.");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+            }
         }
 
         // Gets IQueryable object
@@ -34,7 +38,15 @@ namespace MeetupApp.Data.Repositories
 
         public void RemoveToken(RefreshToken entity)
         {
-            DbSet.Remove(entity);
+            try
+            {
+                DbSet.Remove(entity);
+                Log.Information($"Refresh token with {entity.Id} was deleted.");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+            }
         }
     }
 }
