@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
-using MeetupApp.Core;
 using MeetupApp.Core.DataTransferObjects;
 using MeetupApp.Core.ServiceAbstractions;
 using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
-using System.Reflection;
 
 namespace MeetupApp.WebAPI.Controllers
 {
