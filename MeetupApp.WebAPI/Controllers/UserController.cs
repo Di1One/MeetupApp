@@ -31,6 +31,9 @@ namespace MeetupApp.WebAPI.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
+        /// <response code="200">Returns the user</response>
+        /// <response code="409">Request could not be processed because of conflict in the request</response>
+        /// <response code="400">Request contains null object or invalid object type</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status409Conflict)]

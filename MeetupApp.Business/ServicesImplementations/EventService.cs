@@ -7,6 +7,7 @@ using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
+using System.Reflection;
 
 namespace MeetupApp.Business.ServicesImplementations
 {
@@ -23,13 +24,26 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<EventDto> GetEventByIdAsync(Guid id)
         {
-            var entity = await _unitOfWork.Events.GetEventByIdAsync(id);
+            try
+            {
+                var entity = await _unitOfWork.Events.GetEventByIdAsync(id);
 
-            if (entity == null)
-                throw new ArgumentException("Failed to find record in the database that match the specified id. ", nameof(id));
+                if (entity == null)
+                    throw new ArgumentException("Failed to find record in the database that match the specified id. ", nameof(id));
 
-            var dto = _mapper.Map<EventDto>(entity);
-            return dto;
+                var dto = _mapper.Map<EventDto>(entity);
+                return dto;
+            }
+            catch (ArgumentException ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return null;
+            }
         }
 
         public async Task<List<EventDto>> GetEventsAsync()
@@ -41,34 +55,76 @@ namespace MeetupApp.Business.ServicesImplementations
 
         public async Task<int> CreateEventAsync(EventDto dto)
         {
-            var entity = _mapper.Map<Event>(dto);
-            entity.Id = Guid.NewGuid();
+            try
+            {
+                var entity = _mapper.Map<Event>(dto);
+                entity.Id = Guid.NewGuid();
 
-            if (entity == null)
-                throw new ArgumentException("Mapping EventDto to Event was not possible.", nameof(dto));
+                if (entity == null)
+                    throw new ArgumentException("Mapping EventDto to Event was not possible.", nameof(dto));
 
-            await _unitOfWork.Events.AddEventAsync(entity);
-            return await _unitOfWork.Commit();
+                await _unitOfWork.Events.AddEventAsync(entity);
+                return await _unitOfWork.Commit();
+            }
+            catch (ArgumentException ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return 0;
+            }
         }
 
         public async Task<int> UpdateAsync(Guid id, EventDto dto)
         {
-            var sourceDto = await GetEventByIdAsync(id);
+            try
+            {
+                var sourceDto = await GetEventByIdAsync(id);
 
-            dto.Id = sourceDto.Id;
-            dto.UserId = sourceDto.UserId;
+                dto.Id = sourceDto.Id;
+                dto.UserId = sourceDto.UserId;
 
-            var entity = _mapper.Map<Event>(dto);
+                var entity = _mapper.Map<Event>(dto);
 
-            if (entity == null)
-                throw new ArgumentException("Mapping EventDto to Event was not possible.", nameof(dto));
+                if (entity == null)
+                    throw new ArgumentException("Mapping EventDto to Event was not possible.", nameof(dto));
 
-            _unitOfWork.Events.Update(entity);
-            return await _unitOfWork.Commit();
+                _unitOfWork.Events.Update(entity);
+                return await _unitOfWork.Commit();
+            }
+            catch (ArgumentException ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return 0;
+            }
         }
 
-        public async Task<int> PatchEventAsync(Guid id, List<PatchModel> patchList)
-        {   
+        public async Task<int> PatchEventAsync(Guid id, EventDto dto)
+        {
+            var sourceDto = await GetEventByIdAsync(id);
+
+            var patchList = new List<PatchModel>();
+
+            foreach (PropertyInfo property in typeof(EventDto).GetProperties())
+            {
+                if (!property.GetValue(dto).Equals(property.GetValue(sourceDto)))
+                {
+                    patchList.Add(new PatchModel()
+                    {
+                        PropertyName = property.Name,
+                        PropertyValue = property.GetValue(dto)
+                    });
+                }
+            }
+
             await _unitOfWork.Events.PatchAsync(id, patchList);
             return await _unitOfWork.Commit();
         }
