@@ -142,12 +142,11 @@ namespace MeetupApp.WebAPI.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         /// <response code="200">Returns updated event for the authorized user</response>
-        /// <response code="204">Nothing was changed</response>
+        /// <response code="304">Nothing was changed</response>
         /// <response code="400">Request contains null object or invalid object type</response>
-        /// <exception cref="ArgumentException"></exception>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(EventResponceModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status304NotModified)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateEvent(Guid id, [FromBody] AddorUpdateEventRequestModel model)
         {
@@ -159,7 +158,7 @@ namespace MeetupApp.WebAPI.Controllers
 
                 if (result == 0)
                 {
-                    return NoContent();
+                    return StatusCode(StatusCodes.Status304NotModified, model);
                 }
 
                 var response = _mapper.Map<EventResponceModel>(dto);
@@ -177,65 +176,43 @@ namespace MeetupApp.WebAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <param name="model"></param>
+        /// <returns></returns>
         /// <response code="200">Returns updated event for the authorized user</response>
         /// <response code="400">Request contains null object or invalid object type</response>
-        /// <response code="500">Unexpected error on the server side.</response>
-        /// <returns></returns>
+        /// <response code="304">Nothing was changed</response>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status304NotModified)]
         public async Task<IActionResult> PatchEvent(Guid id, [FromBody] AddorUpdateEventRequestModel model)
         {
-            try
+
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                var sourceDto = await _eventService.GetEventByIdAsync(id);
+
+                if(sourceDto == null)
                 {
-                    var sourceDto = await _eventService.GetEventByIdAsync(id);
-
-                    var dto = _mapper.Map<EventDto>(model);
-                    dto.UserId = sourceDto.UserId;
-                    dto.Id = id;
-
-                    var patchList = new List<PatchModel>();
-
-                    foreach (PropertyInfo property in typeof(EventDto).GetProperties())
-                    {
-                        if (!property.GetValue(dto).Equals(property.GetValue(sourceDto)))
-                        {
-                            patchList.Add(new PatchModel()
-                            {
-                                PropertyName = property.Name,
-                                PropertyValue = property.GetValue(dto)
-                            });
-                        }
-                    }
-
-                    if (patchList.Any())
-                    {
-                        await _eventService.PatchEventAsync(id, patchList);
-                    }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status304NotModified, model);
-                    }
-
-                    var updatedEvent = await _eventService.GetEventByIdAsync(id);
-
-                    var responseModel = _mapper.Map<EventResponceModel>(updatedEvent);
-
-                    return Ok(responseModel);
+                    return NotFound();
                 }
-                else
+
+                var dto = _mapper.Map<EventDto>(model);
+                dto.UserId = sourceDto.UserId;
+                dto.Id = id;
+
+                var result = await _eventService.PatchEventAsync(id, dto);
+
+                if (result == 0)
                 {
-                    return Ok();
+                    return StatusCode(StatusCodes.Status304NotModified, model);
                 }
+
+                return Ok();
             }
-            catch (Exception ex)
+            else
             {
-                Log.Error(ex.Message);
-                return StatusCode(500);
+                return BadRequest();
             }
         }
 

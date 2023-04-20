@@ -7,6 +7,7 @@ using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
+using System.Reflection;
 
 namespace MeetupApp.Business.ServicesImplementations
 {
@@ -106,8 +107,24 @@ namespace MeetupApp.Business.ServicesImplementations
             }
         }
 
-        public async Task<int> PatchEventAsync(Guid id, List<PatchModel> patchList)
-        {   
+        public async Task<int> PatchEventAsync(Guid id, EventDto dto)
+        {
+            var sourceDto = await GetEventByIdAsync(id);
+
+            var patchList = new List<PatchModel>();
+
+            foreach (PropertyInfo property in typeof(EventDto).GetProperties())
+            {
+                if (!property.GetValue(dto).Equals(property.GetValue(sourceDto)))
+                {
+                    patchList.Add(new PatchModel()
+                    {
+                        PropertyName = property.Name,
+                        PropertyValue = property.GetValue(dto)
+                    });
+                }
+            }
+
             await _unitOfWork.Events.PatchAsync(id, patchList);
             return await _unitOfWork.Commit();
         }

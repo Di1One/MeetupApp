@@ -58,16 +58,25 @@ namespace MeetupApp.Data.Repositories
 
         public async Task PatchAsync(Guid id, List<PatchModel> patchData)
         {
-            var model = DbSet.FirstOrDefaultAsync(entity => entity.Id.Equals(id));
+            try
+            {
+                var model = await DbSet.FirstOrDefaultAsync(entity => entity.Id.Equals(id));
 
-            var nameValuePropertiesPairs = patchData
-                .ToDictionary(
-                    patchModel => patchModel.PropertyName,
-                    patchModel => patchModel.PropertyValue);
+                var nameValuePropertiesPairs = patchData
+                    .ToDictionary(
+                        patchModel => patchModel.PropertyName,
+                        patchModel => patchModel.PropertyValue);
 
-            var dbEntityEntry = Database.Entry(model);
-            dbEntityEntry.CurrentValues.SetValues(nameValuePropertiesPairs);
-            dbEntityEntry.State = EntityState.Modified;
+                var dbEntityEntry = Database.Entry(model);
+                dbEntityEntry.CurrentValues.SetValues(nameValuePropertiesPairs);
+                dbEntityEntry.State = EntityState.Modified;
+
+                Log.Information($"Event with {id} was edited.");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+            }
         }
 
         public void RemoveEvent(Event entity)
