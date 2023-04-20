@@ -45,7 +45,15 @@ namespace MeetupApp.Data.Repositories
 
         public void Update(Event entity)
         {
-            DbSet.Update(entity);
+            try
+            {
+                DbSet.Update(entity);
+                Log.Information($"Event with {entity.Id} was updated.");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+            }
         }
 
         public async Task PatchAsync(Guid id, List<PatchModel> patchData)

@@ -33,20 +33,16 @@ namespace MeetupApp.WebAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         /// <response code="200">Returns the event for the authorized user</response>
+        /// <response code="404">Server cannot find the requested resource</response>
         /// <response code="400">Request contains null object or invalid object type</response>
-        /// <response code="500">Unexpected error on the server side.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(EventResponceModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Nullable), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Nullable), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(Nullable), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetEventById(Guid id)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (id.Equals(default))
-                    throw new ArgumentNullException(nameof(id), "A non-empty Id is required.");
-
                 var eventDto = await _eventService.GetEventByIdAsync(id);
 
                 if (eventDto == null)
@@ -56,27 +52,11 @@ namespace MeetupApp.WebAPI.Controllers
 
                 var response = _mapper.Map<EventResponceModel>(eventDto);
 
-                if (response == null)
-                {
-                    throw new ArgumentException("Mapping troubles from dto to model", nameof(response));
-                }
-
                 return Ok(response);
             }
-            catch (ArgumentNullException ex)
+            else
             {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return StatusCode(500);
+                return BadRequest();
             }
         }
 
@@ -85,18 +65,16 @@ namespace MeetupApp.WebAPI.Controllers
         /// </summary>
         /// <returns></returns>
         /// <response code="200">Returns all events for the authorized user</response>
-        /// <response code="500">Unexpected error on the server side.</response>
         [Route("GetAll")]
         [HttpGet]
         [ProducesResponseType(typeof(List<EventResponceModel>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllEvents()
         {
-            var eventDto = await _eventService.GetEventsAsync();
+            var eventsDto = await _eventService.GetEventsAsync();
 
             var response = new List<EventResponceModel>();
 
-            foreach(var ev in eventDto)
+            foreach(var ev in eventsDto)
             {
                 response.Add(_mapper.Map<EventResponceModel>(ev));
             }
@@ -109,57 +87,51 @@ namespace MeetupApp.WebAPI.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        ///  <response code="200">Returns the event for the authorized user</response>
+        /// <response code="201">Returns the event for the authorized user</response>
+        /// <response code="409">Request could not be processed because of conflict in the request</response>
         /// <response code="400">Request contains null object or invalid object type</response>
         /// <response code="500">Unexpected error on the server side.</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateEvent([FromBody] AddorUpdateEventRequestModel model)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
-
                 var eventDto = _mapper.Map<EventDto>(model);
                 var isExist = await _eventService.IsEventExistAsync(model.Name);
 
                 if (isExist)
-                    throw new ArgumentException("The same entry already exists in the storage.", nameof(model));
+                {
+                    return Conflict("The same entry already exists in the storage.");
+                }
 
                 var isOwnerExist = await _userService.IsUserExistsAsync(eventDto.Name);
 
                 if (isOwnerExist)
-                    throw new ArgumentException("Specified owner doest exist", nameof(model));
-
-                if (eventDto != null)
                 {
-                    var user = await _userService.GetUserByEmailAsync(eventDto.Owner);
-                    eventDto.UserId = user.Id;
-                    var result = await _eventService.CreateEventAsync(eventDto);
-
-                    var response = _mapper.Map<EventResponceModel>(eventDto);
-
-                    return CreatedAtAction(nameof(CreateEvent), response);
+                    return Conflict("Specified owner doest exist");
                 }
 
+                var user = await _userService.GetUserByEmailAsync(eventDto.Owner);
+                eventDto.UserId = user.Id;
+
+                var result = await _eventService.CreateEventAsync(eventDto);
+
+                if (result == 0)
+                {
+                    return StatusCode(500);
+                }
+
+                var response = _mapper.Map<EventResponceModel>(eventDto);
+
+                return CreatedAtAction(nameof(CreateEvent), response);
+            }
+            else
+            {
                 return BadRequest();
-            }
-            catch (ArgumentNullException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return Conflict(new ErrorModel { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
             }
         }
 
@@ -170,46 +142,33 @@ namespace MeetupApp.WebAPI.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         /// <response code="200">Returns updated event for the authorized user</response>
+        /// <response code="204">Nothing was changed</response>
         /// <response code="400">Request contains null object or invalid object type</response>
-        /// <response code="500">Unexpected error on the server side.</response>
         /// <exception cref="ArgumentException"></exception>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(EventResponceModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateEvent(Guid id, [FromBody] AddorUpdateEventRequestModel model)
         {
-            try
+            if (ModelState.IsValid) 
             {
-                if (model == null)
-                    throw new ArgumentNullException(nameof(model), "One or more object properties are null.");
-
                 var dto = _mapper.Map<EventDto>(model);
 
                 var result = await _eventService.UpdateAsync(id, dto);
 
                 if (result == 0)
-                    throw new ArgumentNullException(nameof(model), "Nothing was chanched.");
+                {
+                    return NoContent();
+                }
 
                 var response = _mapper.Map<EventResponceModel>(dto);
 
-                if (response == null)
-                {
-                    throw new ArgumentException("Mapping troubles from dto to model", nameof(response));
-                }
-
                 return Ok(response);
             }
-            catch (ArgumentNullException ex)
+            else 
             {
-                Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return BadRequest(new ErrorModel { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return StatusCode(500);
+                return BadRequest(); 
             }
         }
 

@@ -11,8 +11,8 @@
             <param name="id"></param>
             <returns></returns>
             <response code="200">Returns the event for the authorized user</response>
+            <response code="404">Server cannot find the requested resource</response>
             <response code="400">Request contains null object or invalid object type</response>
-            <response code="500">Unexpected error on the server side.</response>
         </member>
         <member name="M:MeetupApp.WebAPI.Controllers.EventController.GetAllEvents">
             <summary>
@@ -20,7 +20,6 @@
             </summary>
             <returns></returns>
             <response code="200">Returns all events for the authorized user</response>
-            <response code="500">Unexpected error on the server side.</response>
         </member>
         <member name="M:MeetupApp.WebAPI.Controllers.EventController.CreateEvent(MeetupApp.WebAPI.Models.Requests.AddorUpdateEventRequestModel)">
             <summary>
@@ -43,6 +42,17 @@
             <response code="400">Request contains null object or invalid object type</response>
             <response code="500">Unexpected error on the server side.</response>
             <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:MeetupApp.WebAPI.Controllers.EventController.PatchEvent(System.Guid,MeetupApp.WebAPI.Models.Requests.AddorUpdateEventRequestModel)">
+            <summary>
+            Edit fields of the event
+            </summary>
+            <param name="id"></param>
+            <param name="model"></param>
+            <response code="200">Returns updated event for the authorized user</response>
+            <response code="400">Request contains null object or invalid object type</response>
+            <response code="500">Unexpected error on the server side.</response>
+            <returns></returns>
         </member>
         <member name="M:MeetupApp.WebAPI.Controllers.EventController.DeleteEvent(System.Guid)">
             <summary>
