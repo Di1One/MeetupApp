@@ -15,7 +15,8 @@ namespace MeetupApp.WebAPI.MappingProfiles
             CreateMap<EventDto, Event>()
                 .ForMember(ent => ent.CreatedDate, opt => opt.MapFrom(dto => DateTime.Now));
 
-            CreateMap<AddorUpdateEventRequestModel, EventDto>();
+            CreateMap<AddorUpdateEventRequestModel, EventDto>().
+                ForMember(dto => dto.Id, opt => opt.MapFrom(mod => Guid.NewGuid()));
             CreateMap<EventDto, EventResponceModel>();
         }
     }
