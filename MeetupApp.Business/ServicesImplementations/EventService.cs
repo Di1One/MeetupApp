@@ -110,6 +110,9 @@ namespace MeetupApp.Business.ServicesImplementations
         {
             var sourceDto = await GetEventByIdAsync(id);
 
+            dto.Id = sourceDto.Id;
+            dto.UserId = sourceDto.UserId;
+
             var patchList = new List<PatchModel>();
 
             foreach (PropertyInfo property in typeof(EventDto).GetProperties())

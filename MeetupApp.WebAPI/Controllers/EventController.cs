@@ -195,8 +195,6 @@ namespace MeetupApp.WebAPI.Controllers
                 }
 
                 var dto = _mapper.Map<EventDto>(model);
-                dto.UserId = sourceDto.UserId;
-                dto.Id = id;
 
                 var result = await _eventService.PatchEventAsync(id, dto);
 
