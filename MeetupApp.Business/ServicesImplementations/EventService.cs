@@ -58,7 +58,6 @@ namespace MeetupApp.Business.ServicesImplementations
             try
             {
                 var entity = _mapper.Map<Event>(dto);
-                entity.Id = Guid.NewGuid();
 
                 if (entity == null)
                     throw new ArgumentException("Mapping EventDto to Event was not possible.", nameof(dto));
