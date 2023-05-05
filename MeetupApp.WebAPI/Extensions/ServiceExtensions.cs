@@ -11,6 +11,7 @@ using Serilog.Events;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using MeetupApp.WebAPI.Middlewares;
 
 namespace MeetupApp.WebAPI.Extensions
 {
@@ -32,6 +33,11 @@ namespace MeetupApp.WebAPI.Extensions
             sb.Append($"{DateTime.Now:yyyyMMddhhmmss}");
             sb.Append("data.log");
             return sb.ToString();
+        }
+
+        public static IApplicationBuilder UseGlobalExceptionHandler(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<GlobalExceptionHandlerMiddleware>();
         }
 
         public static void RegisterRepositories(this IServiceCollection collection)

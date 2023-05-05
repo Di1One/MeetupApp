@@ -35,6 +35,9 @@ namespace MeetupApp.WebAPI
             app.UseStaticFiles();
             app.UseRouting();
 
+            // Using custom middleware to catch errors globally
+            app.UseGlobalExceptionHandler();
+
             app.UseHttpsRedirection();
 
             app.UseSwagger();
