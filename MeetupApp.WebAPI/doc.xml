@@ -12,7 +12,6 @@
             <returns></returns>
             <response code="200">Returns the event for the authorized user</response>
             <response code="404">Server cannot find the requested resource</response>
-            <response code="400">Request contains null object or invalid object type</response>
         </member>
         <member name="M:MeetupApp.WebAPI.Controllers.EventController.GetAllEvents">
             <summary>

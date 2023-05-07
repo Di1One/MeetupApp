@@ -8,6 +8,7 @@ namespace MeetupApp.WebAPI.Models.Requests
     public class AddorUpdateEventRequestModel
     {
         [Required(ErrorMessage = "Name is required field")]
+        [MaxLength(100)]
         public string Name { get; set; }
         public string? Description { get; set; }
 

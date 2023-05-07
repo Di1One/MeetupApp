@@ -36,30 +36,29 @@ namespace MeetupApp.WebAPI.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateJwtToken([FromBody] LoginUserRequestModel request)
         {
-            if (ModelState.IsValid) 
-            { 
-                var user = await _userService.GetUserByEmailAsync(request.Email);
-
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                var isPassCorrect = await _userService.CheckUserPasswordAsync(request.Email, request.Password);
-
-                if (!isPassCorrect)
-                {
-                    var message = "Password is incorrect.";
-                    Log.Information(message);
-                    return BadRequest(new ErrorModel { Message = message });
-                }
-
-                var response = await _jwtUtil.GenerateTokenAsync(user);
-
-                return Ok(response);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
-            
-            return BadRequest();
+
+            var user = await _userService.GetUserByEmailAsync(request.Email);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var isPassCorrect = await _userService.CheckUserPasswordAsync(request.Email, request.Password);
+
+            if (!isPassCorrect)
+            {
+                var message = "Password is incorrect.";
+                return BadRequest(new ErrorModel { Message = message });
+            }
+
+            var response = await _jwtUtil.GenerateTokenAsync(user);
+
+            return Ok(response);
         }
 
 
@@ -78,23 +77,23 @@ namespace MeetupApp.WebAPI.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestModel request)
         {
-            if (ModelState.IsValid) 
-            { 
-                var user = await _userService.GetUserByRefreshTokenAsync(request.RefreshToken);
-
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                var response = await _jwtUtil.GenerateTokenAsync(user);
-
-                await _jwtUtil.RemoveRefreshTokenAsync(request.RefreshToken);
-
-                return Ok(response);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
-            return BadRequest();
+            var user = await _userService.GetUserByRefreshTokenAsync(request.RefreshToken);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var response = await _jwtUtil.GenerateTokenAsync(user);
+
+            await _jwtUtil.RemoveRefreshTokenAsync(request.RefreshToken);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -112,19 +111,19 @@ namespace MeetupApp.WebAPI.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RevokeToken([FromBody] RefreshTokenRequestModel request)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                bool isTokenRevoked = await _jwtUtil.RemoveRefreshTokenAsync(request.RefreshToken);
-
-                if (!isTokenRevoked)
-                {
-                    return NotFound();
-                }
-
-                return Ok();
+                return BadRequest(ModelState);
             }
 
-            return BadRequest();
+            bool isTokenRevoked = await _jwtUtil.RemoveRefreshTokenAsync(request.RefreshToken);
+
+            if (!isTokenRevoked)
+            {
+                return NotFound();
+            }
+
+            return Ok();
         }
     }
 }
