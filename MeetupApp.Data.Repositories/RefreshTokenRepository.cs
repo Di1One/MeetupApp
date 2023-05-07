@@ -27,6 +27,7 @@ namespace MeetupApp.Data.Repositories
             catch (Exception ex)
             {
                 Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                throw;
             }
         }
 
@@ -46,6 +47,7 @@ namespace MeetupApp.Data.Repositories
             catch (Exception ex)
             {
                 Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                throw;
             }
         }
     }
