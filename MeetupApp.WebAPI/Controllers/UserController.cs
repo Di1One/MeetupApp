@@ -40,32 +40,30 @@ namespace MeetupApp.WebAPI.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] RegisterUserRequestModel request)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var userDto = _mapper.Map<UserDto>(request);
-                var userWithSameEmailExists = await _userService.IsUserExistsAsync(request.Email);
+                return BadRequest(ModelState);
+            }
 
-                if (!userWithSameEmailExists
-                    && request.Password.Equals(request.PasswordConfirmation))
+            var userDto = _mapper.Map<UserDto>(request);
+            var userWithSameEmailExists = await _userService.IsUserExistsAsync(request.Email);
+
+            if (!userWithSameEmailExists
+                && request.Password.Equals(request.PasswordConfirmation))
+            {
+                var result = await _userService.RegisterUserAsync(userDto, request.Password);
+
+                if (result > 0)
                 {
-                    var result = await _userService.RegisterUserAsync(userDto, request.Password);
+                    var userInDbDto = await _userService.GetUserByEmailAsync(userDto.Email);
 
-                    if (result > 0)
-                    {
-                        var userInDbDto = await _userService.GetUserByEmailAsync(userDto.Email);
+                    var response = await _jwtUtil.GenerateTokenAsync(userInDbDto);
 
-                        var response = await _jwtUtil.GenerateTokenAsync(userInDbDto);
-
-                        return Ok(response);
-                    }
+                    return Ok(response);
                 }
+            }
 
-                return Conflict();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            return Conflict();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using MeetupApp.Data.Abstractions;
 using MeetupApp.Data.Abstractions.Repositories;
 using MeetupApp.DataBase;
-using MeetupApp.DataBase.Entities;
 
 namespace MeetupApp.Data.Repositories
 {

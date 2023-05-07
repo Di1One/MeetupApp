@@ -31,30 +31,21 @@ namespace MeetupApp.WebAPI.Controllers
         /// <returns></returns>
         /// <response code="200">Returns the event for the authorized user</response>
         /// <response code="404">Server cannot find the requested resource</response>
-        /// <response code="400">Request contains null object or invalid object type</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(EventResponceModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Nullable), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(Nullable), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetEventById(Guid id)
         {
-            if (ModelState.IsValid)
+            var eventDto = await _eventService.GetEventByIdAsync(id);
+
+            if (eventDto == null)
             {
-                var eventDto = await _eventService.GetEventByIdAsync(id);
-
-                if (eventDto == null)
-                {
-                    return NotFound();
-                }
-
-                var response = _mapper.Map<EventResponceModel>(eventDto);
-
-                return Ok(response);
+                return NotFound();
             }
-            else
-            {
-                return BadRequest();
-            }
+
+            var response = _mapper.Map<EventResponceModel>(eventDto);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -95,41 +86,39 @@ namespace MeetupApp.WebAPI.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateEvent([FromBody] AddorUpdateEventRequestModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var eventDto = _mapper.Map<EventDto>(model);
-                var isExist = await _eventService.IsEventExistAsync(model.Name);
-
-                if (isExist)
-                {
-                    return Conflict("The same entry already exists in the storage.");
-                }
-
-                var isOwnerExist = await _userService.IsUserExistsAsync(eventDto.Name);
-
-                if (isOwnerExist)
-                {
-                    return Conflict("Specified owner doest exist");
-                }
-
-                var user = await _userService.GetUserByEmailAsync(eventDto.Owner);
-                eventDto.UserId = user.Id;
-
-                var result = await _eventService.CreateEventAsync(eventDto);
-
-                if (result == 0)
-                {
-                    return StatusCode(500);
-                }
-
-                var response = _mapper.Map<EventResponceModel>(eventDto);
-
-                return CreatedAtAction(nameof(CreateEvent), response);
+                return BadRequest(ModelState); 
             }
-            else
+
+            var eventDto = _mapper.Map<EventDto>(model);
+            var isExist = await _eventService.IsEventExistAsync(model.Name);
+
+            if (isExist)
             {
-                return BadRequest();
+                return Conflict("The same entry already exists in the storage.");
             }
+
+            var isOwnerExist = await _userService.IsUserExistsAsync(eventDto.Name);
+
+            if (isOwnerExist)
+            {
+                return Conflict("Specified owner doest exist");
+            }
+
+            var user = await _userService.GetUserByEmailAsync(eventDto.Owner);
+            eventDto.UserId = user.Id;
+
+            var result = await _eventService.CreateEventAsync(eventDto);
+
+            if (result == 0)
+            {
+                return StatusCode(500);
+            }
+
+            var response = _mapper.Map<EventResponceModel>(eventDto);
+
+            return CreatedAtAction(nameof(CreateEvent), response);
         }
 
         /// <summary>
@@ -147,25 +136,23 @@ namespace MeetupApp.WebAPI.Controllers
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateEvent(Guid id, [FromBody] AddorUpdateEventRequestModel model)
         {
-            if (ModelState.IsValid) 
+            if (!ModelState.IsValid) 
             {
-                var dto = _mapper.Map<EventDto>(model);
-
-                var result = await _eventService.UpdateAsync(id, dto);
-
-                if (result == 0)
-                {
-                    return StatusCode(StatusCodes.Status304NotModified, model);
-                }
-
-                var response = _mapper.Map<EventResponceModel>(dto);
-
-                return Ok(response);
+                return BadRequest(ModelState);
             }
-            else 
+
+            var dto = _mapper.Map<EventDto>(model);
+
+            var result = await _eventService.UpdateAsync(id, dto);
+
+            if (result == 0)
             {
-                return BadRequest(); 
+                return StatusCode(StatusCodes.Status304NotModified, model);
             }
+
+            var response = _mapper.Map<EventResponceModel>(dto);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -185,30 +172,28 @@ namespace MeetupApp.WebAPI.Controllers
         public async Task<IActionResult> PatchEvent(Guid id, [FromBody] AddorUpdateEventRequestModel model)
         {
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var sourceDto = await _eventService.GetEventByIdAsync(id);
-
-                if(sourceDto == null)
-                {
-                    return NotFound();
-                }
-
-                var dto = _mapper.Map<EventDto>(model);
-
-                var result = await _eventService.PatchEventAsync(id, dto);
-
-                if (result == 0)
-                {
-                    return StatusCode(StatusCodes.Status304NotModified, model);
-                }
-
-                return Ok();
+                return BadRequest(ModelState);
             }
-            else
+
+            var sourceDto = await _eventService.GetEventByIdAsync(id);
+
+            if (sourceDto == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+
+            var dto = _mapper.Map<EventDto>(model);
+
+            var result = await _eventService.PatchEventAsync(id, dto);
+
+            if (result == 0)
+            {
+                return StatusCode(StatusCodes.Status304NotModified, model);
+            }
+
+            return Ok();
         }
 
         /// <summary>
