@@ -29,5 +29,11 @@ namespace MeetupApp.Data.Repositories
         {
             return await _dbContext.SaveChangesAsync();
         }
+
+        public void Dispose()
+        {
+            _dbContext.Dispose();
+            GC.SuppressFinalize(this);
+        }
     }
 }
