@@ -99,6 +99,7 @@ namespace MeetupApp.WebAPI.Controllers
                 return Conflict("The same entry already exists in the storage.");
             }
 
+            // todo
             //var isOwnerExist = await _userService.IsUserExistsAsync(eventDto.Name);
 
             //if (isOwnerExist)
