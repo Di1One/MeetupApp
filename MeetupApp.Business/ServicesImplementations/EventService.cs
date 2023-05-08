@@ -6,7 +6,6 @@ using MeetupApp.Data.Abstractions;
 using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System;
 using System.Reflection;
 
 namespace MeetupApp.Business.ServicesImplementations
@@ -14,12 +13,14 @@ namespace MeetupApp.Business.ServicesImplementations
     public class EventService : IEventService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public EventService(IMapper mapper, IUnitOfWork unitOfWork)
+        public EventService(IMapper mapper, IUnitOfWork unitOfWork, IUserService userService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _userService = userService;
         }
 
         public async Task<EventDto> GetEventByIdAsync(Guid id)
@@ -53,27 +54,45 @@ namespace MeetupApp.Business.ServicesImplementations
             return _mapper.Map<List<EventDto>>(events);
         }
 
-        public async Task<int> CreateEventAsync(EventDto dto)
+        public async Task<(int success, string message)> CreateEventAsync(EventDto dto)
         {
             try
             {
+                var isExist = await _unitOfWork.Events.IsEventExistAsync(dto.Name);
+
+                if (isExist)
+                {
+                    return (0, "The same entry already exists in the storage.");
+                }
+
+                var isOwnerExist = await _unitOfWork.Users.IsUserExistsAsync(dto.Name);
+
+                if (isOwnerExist)
+                {
+                    return (0, "Specified owner doest exist");
+                }
+
+                var user = await _userService.GetUserByEmailAsync(dto.Owner);
+                dto.UserId = user.Id;
                 var entity = _mapper.Map<Event>(dto);
 
                 if (entity == null)
                     throw new ArgumentException("Mapping EventDto to Event was not possible.", nameof(dto));
 
                 await _unitOfWork.Events.AddEventAsync(entity);
-                return await _unitOfWork.Commit();
+                var result = await _unitOfWork.Commit();
+
+                return (result, "Event was created");
             }
             catch (ArgumentException ex)
             {
                 Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return 0;
+                return (0,"One of the fileds was null");
             }
             catch (Exception ex)
             {
                 Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return 0;
+                return (0,"Server promlems");
             }
         }
 
@@ -109,6 +128,11 @@ namespace MeetupApp.Business.ServicesImplementations
         public async Task<int> PatchEventAsync(Guid id, EventDto dto)
         {
             var sourceDto = await GetEventByIdAsync(id);
+
+            if (sourceDto == null)
+            {
+                return 0;
+            }
 
             dto.Id = sourceDto.Id;
             dto.UserId = sourceDto.UserId;
@@ -157,11 +181,6 @@ namespace MeetupApp.Business.ServicesImplementations
                 Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
                 return 0;
             }
-        }
-
-        public async Task<bool> IsEventExistAsync(string name)
-        {
-            return await _unitOfWork.Events.GetAllEvent().AnyAsync(ev => ev.Name.Equals(name));
         }
     }
 }

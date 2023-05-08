@@ -27,9 +27,8 @@
             <param name="model"></param>
             <returns></returns>
             <response code="201">Returns the event for the authorized user</response>
-            <response code="409">Request could not be processed because of conflict in the request</response>
             <response code="400">Request contains null object or invalid object type</response>
-            <response code="500">Unexpected error on the server side.</response>
+            <response code="409">Request could not be processed because of conflict in the request</response>
         </member>
         <member name="M:MeetupApp.WebAPI.Controllers.EventController.UpdateEvent(System.Guid,MeetupApp.WebAPI.Models.Requests.AddorUpdateEventRequestModel)">
             <summary>

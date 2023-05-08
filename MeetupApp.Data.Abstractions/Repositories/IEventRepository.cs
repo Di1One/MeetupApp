@@ -8,6 +8,7 @@ namespace MeetupApp.Data.Abstractions.Repositories
         //READ
         Task<Event> GetEventByIdAsync(Guid id);
         IQueryable<Event> GetAllEvent();
+        Task<bool> IsEventExistAsync(string name);
 
         //CREATE
         Task AddEventAsync(Event entity);

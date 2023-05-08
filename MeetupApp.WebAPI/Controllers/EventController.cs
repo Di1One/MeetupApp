@@ -76,13 +76,11 @@ namespace MeetupApp.WebAPI.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         /// <response code="201">Returns the event for the authorized user</response>
-        /// <response code="409">Request could not be processed because of conflict in the request</response>
         /// <response code="400">Request contains null object or invalid object type</response>
-        /// <response code="500">Unexpected error on the server side.</response>
+        /// <response code="409">Request could not be processed because of conflict in the request</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateEvent([FromBody] AddorUpdateEventRequestModel model)
         {
@@ -92,29 +90,12 @@ namespace MeetupApp.WebAPI.Controllers
             }
 
             var eventDto = _mapper.Map<EventDto>(model);
-            var isExist = await _eventService.IsEventExistAsync(model.Name);
 
-            if (isExist)
-            {
-                return Conflict("The same entry already exists in the storage.");
-            }
-
-            // todo
-            //var isOwnerExist = await _userService.IsUserExistsAsync(eventDto.Name);
-
-            //if (isOwnerExist)
-            //{
-            //    return Conflict("Specified owner doest exist");
-            //}
-
-            var user = await _userService.GetUserByEmailAsync(eventDto.Owner);
-            eventDto.UserId = user.Id;
-
-            var result = await _eventService.CreateEventAsync(eventDto);
+            var (result, message) = await _eventService.CreateEventAsync(eventDto);
 
             if (result == 0)
             {
-                return StatusCode(500);
+                return Conflict(new ErrorModel { Message = message });
             }
 
             var response = _mapper.Map<EventResponceModel>(eventDto);
@@ -176,13 +157,6 @@ namespace MeetupApp.WebAPI.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-
-            var sourceDto = await _eventService.GetEventByIdAsync(id);
-
-            if (sourceDto == null)
-            {
-                return NotFound();
             }
 
             var dto = _mapper.Map<EventDto>(model);

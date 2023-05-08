@@ -1,4 +1,5 @@
 ﻿using MeetupApp.Core;
+using MeetupApp.Data.Abstractions;
 using MeetupApp.Data.Abstractions.Repositories;
 using MeetupApp.DataBase;
 using MeetupApp.DataBase.Entities;
@@ -28,6 +29,11 @@ namespace MeetupApp.Data.Repositories
         public IQueryable<Event> GetAllEvent()
         {
             return DbSet;
+        }
+
+        public async Task<bool> IsEventExistAsync(string name)
+        {
+            return await DbSet.AnyAsync(ev => ev.Name == name);
         }
 
         public async Task AddEventAsync(Event entity)
