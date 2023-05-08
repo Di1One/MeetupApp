@@ -29,12 +29,12 @@ namespace MeetupApp.WebAPI.Utils
                 .ToUniversalTime();
 
             var claims = new List<Claim>()
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, dto.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("D")), //jwt uniq id from spec
-            new Claim(ClaimTypes.NameIdentifier, dto.Id.ToString("D")),
-            new Claim(ClaimTypes.Role, dto.RoleName),
-        };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, dto.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("D")), //jwt uniq id from spec
+                new Claim(ClaimTypes.NameIdentifier, dto.Id.ToString("D")),
+                new Claim(ClaimTypes.Role, dto.RoleName),
+            };
 
             var jwtToken = new JwtSecurityToken(_configuration["Token:Issuer"],
                 _configuration["Token:Issuer"],
