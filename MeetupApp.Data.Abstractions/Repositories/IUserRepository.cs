@@ -8,6 +8,9 @@ namespace MeetupApp.Data.Abstractions.Repositories
         //READ
         IQueryable<User> Get();
 
+        Task<bool> IsUserExistsAsync(string email);
+        Task<string?> GetUserPasswordHashAsync(string email);
+
         IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression,
             params Expression<Func<User, object>>[] includes);
 

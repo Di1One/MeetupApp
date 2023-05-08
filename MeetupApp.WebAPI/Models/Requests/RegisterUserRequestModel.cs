@@ -22,6 +22,7 @@ namespace MeetupApp.WebAPI.Models.Requests
         /// <summary>
         /// Confirmation of the user password
         /// </summary>
+        [Compare("Password", ErrorMessage = "Passwords do not match.")]
         public string PasswordConfirmation { get; set; }
     }
 }

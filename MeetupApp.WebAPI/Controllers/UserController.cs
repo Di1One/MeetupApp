@@ -46,24 +46,19 @@ namespace MeetupApp.WebAPI.Controllers
             }
 
             var userDto = _mapper.Map<UserDto>(request);
-            var userWithSameEmailExists = await _userService.IsUserExistsAsync(request.Email);
 
-            if (!userWithSameEmailExists
-                && request.Password.Equals(request.PasswordConfirmation))
+            var (success, message) = await _userService.RegisterUserAsync(userDto, request.Password);
+
+            if (success)
             {
-                var result = await _userService.RegisterUserAsync(userDto, request.Password);
+                var userInDbDto = await _userService.GetUserByEmailAsync(userDto.Email);
 
-                if (result > 0)
-                {
-                    var userInDbDto = await _userService.GetUserByEmailAsync(userDto.Email);
+                var response = await _jwtUtil.GenerateTokenAsync(userInDbDto);
 
-                    var response = await _jwtUtil.GenerateTokenAsync(userInDbDto);
+                return Ok(response);
+            } 
 
-                    return Ok(response);
-                }
-            }
-
-            return Conflict();
+            return Conflict(new ErrorModel { Message = message });
         }
     }
 }
