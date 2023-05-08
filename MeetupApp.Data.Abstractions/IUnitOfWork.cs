@@ -3,7 +3,7 @@ using MeetupApp.DataBase.Entities;
 
 namespace MeetupApp.Data.Abstractions
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
         IUserRepository Users { get; }
         IRoleRepository Roles { get; }
