@@ -32,6 +32,18 @@ namespace MeetupApp.Data.Repositories
             }
         }
 
+        public async Task<bool> IsUserExistsAsync(string email)
+        {
+            return await DbSet.AnyAsync(user => user.Email == email);
+        }
+
+        public async Task<string?> GetUserPasswordHashAsync(string email)
+        {
+            return (await DbSet
+                .FirstOrDefaultAsync(user => user.Email == email))
+                ?.PasswordHash;
+        }
+
         public IQueryable<User> FindBy(Expression<Func<User, bool>> searchExpression, params Expression<Func<User, object>>[] includes)
         {
             var result = DbSet.Where(searchExpression);

@@ -6,7 +6,6 @@ using MeetupApp.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using System;
 
 namespace MeetupApp.Business.ServicesImplementations
 {
@@ -77,25 +76,24 @@ namespace MeetupApp.Business.ServicesImplementations
             }
         }
 
-        public async Task<bool> IsUserExistsAsync(string email)
-        {
-            return await _unitOfWork.Users.Get().AnyAsync(user => user.Email.Equals(email));
-        }
-
         public async Task<bool> CheckUserPasswordAsync(string email, string password)
         {
-            var dbPasswordHash = (await _unitOfWork.Users
-                .Get()
-                .FirstOrDefaultAsync(user => user.Email.Equals(email)))
-                ?.PasswordHash;
+            var dbPasswordHash = await _unitOfWork.Users.GetUserPasswordHashAsync(email);
 
             return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
         }
 
-        public async Task<int> RegisterUserAsync(UserDto dto, string password)
+        public async Task<(bool success, string message)> RegisterUserAsync(UserDto dto, string password)
         {
             try
             {
+                var userWithSameEmailExists = await _unitOfWork.Users.IsUserExistsAsync(dto.Email);
+
+                if (userWithSameEmailExists)
+                {
+                    return (false, "User with the same email already exists.");
+                }
+
                 var userRoleId = await _roleService.GetRoleIdForDefaultRoleAsync();
                 dto.RoleId = userRoleId;
 
@@ -104,12 +102,20 @@ namespace MeetupApp.Business.ServicesImplementations
                 user.PasswordHash = CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}");
 
                 await _unitOfWork.Users.AddAsync(user);
-                return await _unitOfWork.Commit();
+
+                var result = await _unitOfWork.Commit();
+
+                if (result > 0)
+                {
+                    return (true, "User registered successfully.");
+                }
+
+                return (false, "User registration failed.");
             }
             catch (Exception ex) 
             {
                 Log.Warning($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
-                return 0;
+                return (false, "User registration failed.");
             }
         }
 
