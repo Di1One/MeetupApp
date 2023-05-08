@@ -3,7 +3,6 @@ using MeetupApp.WebAPI.Models.Requests;
 using MeetupApp.WebAPI.Models.Responces;
 using MeetupApp.WebAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace MeetupApp.WebAPI.Controllers
 {
@@ -28,11 +27,9 @@ namespace MeetupApp.WebAPI.Controllers
         /// <param name="request">login model</param>
         /// <returns>An access token for an authorized user.</returns>
         /// <response code="200">Returns the access token for the authorized user</response>
-        /// <response code="404">Server cannot find the requested resource</response>
         /// <response code="400">Request contains null object or invalid object type</response>
         [HttpPost]
         [ProducesResponseType(typeof(TokenResponseModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateJwtToken([FromBody] LoginUserRequestModel request)
         {
@@ -41,24 +38,17 @@ namespace MeetupApp.WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = await _userService.GetUserByEmailAsync(request.Email);
+            var (success, message) = await _userService.AuthenticateUserAsync(request.Email, request.Password);
 
-            if (user == null)
+            if (success)
             {
-                return NotFound();
+                var user = await _userService.GetUserByEmailAsync(request.Email);
+                var response = await _jwtUtil.GenerateTokenAsync(user);
+
+                return Ok(response);
             }
 
-            var isPassCorrect = await _userService.CheckUserPasswordAsync(request.Email, request.Password);
-
-            if (!isPassCorrect)
-            {
-                var message = "Password is incorrect.";
-                return BadRequest(new ErrorModel { Message = message });
-            }
-
-            var response = await _jwtUtil.GenerateTokenAsync(user);
-
-            return Ok(response);
+            return BadRequest(new ErrorModel { Message = message });
         }
 
 

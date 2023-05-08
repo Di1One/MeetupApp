@@ -119,6 +119,23 @@ namespace MeetupApp.Business.ServicesImplementations
             }
         }
 
+        public async Task<(bool success, string message)> AuthenticateUserAsync(string email, string password)
+        {
+            var user = await GetUserByEmailAsync(email);
+
+            if (user == null)
+            {
+                return (false, "User not found.");
+            }
+
+            if (!await CheckUserPasswordAsync(email, password))
+            {
+                return (false, "Password is incorrect.");
+            }
+
+            return (true, "User authenticated.");
+        }
+
         private string CreateMd5(string password)
         {
             var passwordSalt = _configuration["UserSecrets:PasswordSalt"];
