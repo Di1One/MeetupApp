@@ -8,7 +8,7 @@ namespace MeetupApp.WebAPI.Models.Requests
     public class AddorUpdateEventRequestModel
     {
         [Required(ErrorMessage = "Name is required field")]
-        [MaxLength(100)]
+        [StringLength(75, MinimumLength = 3, ErrorMessage = "Invalid name length")]
         public string Name { get; set; }
         public string? Description { get; set; }
 
@@ -18,6 +18,6 @@ namespace MeetupApp.WebAPI.Models.Requests
 
         [Required(ErrorMessage = "Start time is required field")]
         public DateTime StartTime { get; set; }
-        public string? Location { get; set; }
+        public string? Location { get; set; } = "MeetupAppLocation";
     }
 }
