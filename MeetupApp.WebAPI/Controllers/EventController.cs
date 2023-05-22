@@ -15,13 +15,11 @@ namespace MeetupApp.WebAPI.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IEventService _eventService;
-        private readonly IUserService _userService;
 
-        public EventController(IMapper mapper, IEventService eventService, IUserService userService)
+        public EventController(IMapper mapper, IEventService eventService)
         {
             _mapper = mapper;
             _eventService = eventService;
-            _userService = userService;
         }
 
         /// <summary>
